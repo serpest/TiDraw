@@ -1,4 +1,4 @@
-package com.serpest.tidraw.exception;
+package com.serpest.tidraw.controller.exception;
 
 public class DrawNotFoundException extends RuntimeException {
 

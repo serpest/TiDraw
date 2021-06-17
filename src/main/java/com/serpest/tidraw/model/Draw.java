@@ -25,19 +25,31 @@ public class Draw {
 	private Instant creationInstant;
 
 	@Column
+	private Instant lastModifiedInstant;
+
+	@Column
 	private Instant drawInstant;
 
 	@Column
-	private int winnerElementsSize;
+	private int selectedElementsSize;
 
 	@ElementCollection
 	private Set<String> raffleElements;
 
 	@ElementCollection
-	private List<String> winnerElements;
+	private List<String> selectedElements;
+
+	public Draw() {
+		setCreationInstant(Instant.now());
+	}
 
 	public long getId() {
 		return id;
+	}
+
+	public void setId(long id) {
+		this.id = id;
+		setLastModifiedInstant(Instant.now());
 	}
 
 	public String getName() {
@@ -46,14 +58,19 @@ public class Draw {
 
 	public void setName(String name) {
 		this.name = name;
+		setLastModifiedInstant(Instant.now());
 	}
 
 	public Instant getCreationInstant() {
 		return creationInstant;
 	}
 
-	public void setCreationInstant(Instant creationInstant) {
-		this.creationInstant = creationInstant;
+	public Instant getLastModifiedInstant() {
+		return lastModifiedInstant;
+	}
+
+	public void setLastModifiedInstant(Instant lastModifiedInstant) {
+		this.lastModifiedInstant = lastModifiedInstant;
 	}
 
 	public Instant getDrawInstant() {
@@ -62,17 +79,22 @@ public class Draw {
 
 	public void setDrawInstant(Instant drawInstant) {
 		this.drawInstant = drawInstant;
+		setLastModifiedInstant(Instant.now());
 	}
 
-
-	public int getWinnerElementsSize() {
-		return winnerElementsSize;
+	public int getSelectedElementsSize() {
+		return selectedElementsSize;
 	}
 
-	public void setWinnerElementsSize(int winnerElementsSize) {
-		if (winnerElementsSize < 1)
-			throw new IllegalArgumentException("The number of winner elements must me greater than or equal to 1");
-		this.winnerElementsSize = winnerElementsSize;
+	/**
+	 * @param selectedElementsSize the number of selected elements
+	 * @throws IllegalArgumentException if <code>selectedElementsSize</code> is less then 1
+	 */
+	public void setSelectedElementsSize(int selectedElementsSize) {
+		if (selectedElementsSize < 1)
+			throw new IllegalArgumentException("The number of selected elements must me greater than or equal to 1");
+		this.selectedElementsSize = selectedElementsSize;
+		setLastModifiedInstant(Instant.now());
 	}
 
 	public Set<String> getRaffleElements() {
@@ -81,14 +103,21 @@ public class Draw {
 
 	public void setRaffleElements(Set<String> raffleElements) {
 		this.raffleElements = raffleElements;
+		setLastModifiedInstant(Instant.now());
 	}
 
-	public List<String> getWinnerElements() {
-		return winnerElements;
+	public List<String> getSelectedElements() {
+		return selectedElements;
 	}
 
-	public void setWinnerElements(List<String> winnerElements) {
-		this.winnerElements = winnerElements;
+	void setSelectedElements(List<String> selectedElements) {
+		this.selectedElements = selectedElements;
+		setLastModifiedInstant(Instant.now());
+	}
+
+	private void setCreationInstant(Instant creationInstant) {
+		this.creationInstant = creationInstant;
+		setLastModifiedInstant(Instant.now());
 	}
 
 }
