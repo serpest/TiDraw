@@ -10,6 +10,12 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.validation.constraints.Future;
+import javax.validation.constraints.Min;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 
 @Entity
 public class Draw {
@@ -19,6 +25,8 @@ public class Draw {
 	private long id;
 
 	@Column
+	@NotBlank
+	@Size(min=1, max=280)
 	private String name;
 
 	@Column
@@ -27,12 +35,17 @@ public class Draw {
 	@Column
 	private Instant lastModifiedInstant;
 
+	@NotNull
+	@Future
 	@Column
 	private Instant drawInstant;
 
+	@NotNull
+	@Min(1)
 	@Column
 	private int selectedElementsSize;
 
+	@NotEmpty
 	@ElementCollection
 	private Set<String> raffleElements;
 
@@ -86,13 +99,7 @@ public class Draw {
 		return selectedElementsSize;
 	}
 
-	/**
-	 * @param selectedElementsSize the number of selected elements
-	 * @throws IllegalArgumentException if <code>selectedElementsSize</code> is less then 1
-	 */
 	public void setSelectedElementsSize(int selectedElementsSize) {
-		if (selectedElementsSize < 1)
-			throw new IllegalArgumentException("The number of selected elements must me greater than or equal to 1");
 		this.selectedElementsSize = selectedElementsSize;
 		setLastModifiedInstant(Instant.now());
 	}
