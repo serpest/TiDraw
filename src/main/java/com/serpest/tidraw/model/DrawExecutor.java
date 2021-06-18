@@ -9,12 +9,22 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+/* TODO: It should work with DrawRepository using id to minimize memory occupied by the draws currently used
+ * Currently it's useless because it doesn't save the draws in the repository
+ */
 public class DrawExecutor {
+
+	private static final int CORE_POOL_SIZE = 2;
+	
+	private static final Logger log = LoggerFactory.getLogger(DrawExecutor.class);
 
 	private ScheduledExecutorService scheduler;
 
 	public DrawExecutor()  {
-		scheduler = Executors.newScheduledThreadPool(4); // The number of threads is fixed, so it doesn't scale based on the number of scheduled draws. This could cause lags
+		scheduler = Executors.newScheduledThreadPool(CORE_POOL_SIZE); // The number of threads is fixed, so it doesn't scale based on the number of scheduled draws. This could cause lags
 	}
 
 	public void executeDraw(Draw draw) {
@@ -25,20 +35,13 @@ public class DrawExecutor {
 		List<String> shuffledList = new ArrayList<>(draw.getRaffleElements());
 		Collections.shuffle(shuffledList);
 		draw.setSelectedElements(shuffledList.subList(0, draw.getSelectedElementsSize()));
+		log.info("Draw " + draw.getId() + " executed");
 	}
 
-	/**
-	 * Schedules the draw execution.
-	 * 
-	 * @param draw the draw to schedule
-	 * @throws NullPointerException if <code>draw</code> or <code>draw.getDrawInstant()</code> are null
-	 * @throws IllegalArgumentException if the draw instant is not in the future
-	 */
 	public void scheduleDrawExecution(Draw draw) {
-		if (draw.getDrawInstant().compareTo(Instant.now()) <= 0)
-			throw new IllegalArgumentException("The draw instant must be in the future");
 		long millisecondsDelay = Duration.between(Instant.now(), draw.getDrawInstant()).toMillis();
 		scheduler.schedule(() -> executeDraw(draw), millisecondsDelay, TimeUnit.MILLISECONDS);
+		log.info("Draw " + draw.getId() + " execution scheduled");
 	}
 
 }

@@ -5,6 +5,8 @@ import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 
+import javax.validation.Valid;
+
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -41,7 +43,7 @@ public class DrawController {
 	@GetMapping("/draws/{id}/selected")
 	public List<String> getDrawSelectedElements(@PathVariable long id) {
 		Draw draw = getDraw(id);
-		if (draw.getDrawInstant().isAfter(Instant.now()) || draw.getSelectedElements().isEmpty())
+		if (draw.getSelectedElements() == null)
 			throw new DrawNotYetComputedException(id);
 		return draw.getSelectedElements();
 	}
@@ -57,14 +59,13 @@ public class DrawController {
 	}
 
 	@PostMapping("/draws")
-	public Draw createDraw(@RequestBody Draw draw) {
+	public Draw createDraw(@RequestBody @Valid Draw draw) {
 		DRAW_EXECUTOR.scheduleDrawExecution(draw);
 		return DRAW_REPOSITORY.save(draw);
 	}
 
 	@PutMapping("/draws/{id}")
 	public Draw replaceDraw(@PathVariable long id, @RequestBody Draw newDraw) {
-		// TODO: Change draw execution schedule
 		return DRAW_REPOSITORY.findById(id).map(originalDraw -> {
 					if (!isThereEnoughTimeToEditDrawBeforeDrawExecution(originalDraw))
 						throw new EditingTimeLimitExceededException(id);
@@ -72,6 +73,7 @@ public class DrawController {
 					originalDraw.setDrawInstant(newDraw.getDrawInstant());
 					originalDraw.setSelectedElementsSize(newDraw.getSelectedElementsSize());
 					originalDraw.setRaffleElements(newDraw.getRaffleElements());
+					// TODO: Change draw execution schedule
 					return DRAW_REPOSITORY.save(originalDraw);
 				})
 				.orElseGet(() -> {
@@ -80,12 +82,12 @@ public class DrawController {
 	}
 
 	@PatchMapping("/draws/{id}")
-	public Draw editDrawInstant(@PathVariable long id, @RequestBody Instant newDrawInstant) {
-		// TODO: Change draw execution schedule
+	public Draw editDrawInstant(@PathVariable long id, @RequestBody Instant newDrawInstant) { // TODO: Implement newDrawInstant validation
 		Draw draw = getDraw(id);
 		if (draw.getDrawInstant().isBefore(Instant.now()))
 			throw new EditingTimeLimitExceededException(id);
 		draw.setDrawInstant(newDrawInstant);
+		// TODO: Change draw execution schedule
 		return DRAW_REPOSITORY.save(draw);
 	}
 
