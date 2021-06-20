@@ -117,10 +117,12 @@ public class Draw {
 	}
 
 	public List<String> getSelectedElements() {
+		if (drawInstant.isAfter(Instant.now()))
+			return null;
 		return selectedElements;
 	}
 
-	void setSelectedElements(List<String> selectedElements) {
+	public void setSelectedElements(List<String> selectedElements) {
 		this.selectedElements = selectedElements;
 		setLastModifiedInstant(Instant.now());
 	}

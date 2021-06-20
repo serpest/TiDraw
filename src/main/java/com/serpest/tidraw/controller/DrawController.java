@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.serpest.tidraw.controller.exception.DrawNotFoundException;
-import com.serpest.tidraw.controller.exception.DrawNotYetComputedException;
+import com.serpest.tidraw.controller.exception.DrawNotYetExecutedException;
 import com.serpest.tidraw.controller.exception.EditingTimeLimitExceededException;
 import com.serpest.tidraw.model.Draw;
 import com.serpest.tidraw.model.DrawExecutor;
@@ -44,7 +44,7 @@ public class DrawController {
 	public List<String> getDrawSelectedElements(@PathVariable long id) {
 		Draw draw = getDraw(id);
 		if (draw.getSelectedElements() == null)
-			throw new DrawNotYetComputedException(id);
+			throw new DrawNotYetExecutedException(id);
 		return draw.getSelectedElements();
 	}
 
@@ -60,7 +60,7 @@ public class DrawController {
 
 	@PostMapping("/draws")
 	public Draw createDraw(@RequestBody @Valid Draw draw) {
-		DRAW_EXECUTOR.scheduleDrawExecution(draw);
+		DRAW_EXECUTOR.executeDraw(draw); // The draw is executed immediately after receiving the draw and not at the specified draw instant
 		return DRAW_REPOSITORY.save(draw);
 	}
 
@@ -73,7 +73,7 @@ public class DrawController {
 					originalDraw.setDrawInstant(newDraw.getDrawInstant());
 					originalDraw.setSelectedElementsSize(newDraw.getSelectedElementsSize());
 					originalDraw.setRaffleElements(newDraw.getRaffleElements());
-					// TODO: Change draw execution schedule
+					DRAW_EXECUTOR.executeDraw(originalDraw);
 					return DRAW_REPOSITORY.save(originalDraw);
 				})
 				.orElseGet(() -> {
@@ -87,7 +87,7 @@ public class DrawController {
 		if (draw.getDrawInstant().isBefore(Instant.now()))
 			throw new EditingTimeLimitExceededException(id);
 		draw.setDrawInstant(newDrawInstant);
-		// TODO: Change draw execution schedule
+		DRAW_EXECUTOR.executeDraw(draw);
 		return DRAW_REPOSITORY.save(draw);
 	}
 

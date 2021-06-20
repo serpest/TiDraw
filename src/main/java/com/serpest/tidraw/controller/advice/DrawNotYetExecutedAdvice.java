@@ -6,15 +6,15 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
-import com.serpest.tidraw.controller.exception.DrawNotYetComputedException;
+import com.serpest.tidraw.controller.exception.DrawNotYetExecutedException;
 
 @ControllerAdvice
-public class DrawNotYetComputedAdvice {
+public class DrawNotYetExecutedAdvice {
 
 	@ResponseBody
-	@ExceptionHandler(DrawNotYetComputedException.class)
+	@ExceptionHandler(DrawNotYetExecutedException.class)
 	@ResponseStatus(code = HttpStatus.LOCKED)
-	public String handleDrawNotYetComputedException(DrawNotYetComputedException exc) {
+	public String handleDrawNotYetComputedException(DrawNotYetExecutedException exc) {
 		return exc.getMessage();
 	}
 
