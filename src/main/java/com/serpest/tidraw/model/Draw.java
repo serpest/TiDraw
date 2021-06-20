@@ -10,7 +10,7 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.validation.constraints.Future;
+import javax.validation.constraints.FutureOrPresent;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotEmpty;
@@ -19,7 +19,7 @@ import javax.validation.constraints.Size;
 
 import com.serpest.tidraw.validation.DrawConstraint;
 
-@DrawConstraint
+@DrawConstraint(message="The number of selected elements must be less then or equal to the number of the raffle elements")
 @Entity
 public class Draw {
 
@@ -28,8 +28,8 @@ public class Draw {
 	private long id;
 
 	@Column
-	@NotBlank
-	@Size(min=1, max=280)
+	@NotBlank(message="The draw's name must not be null and must contain at least one non-whitespace character")
+	@Size(min=1, max=280, message="The draw's name length must be between 1 and 280 characters")
 	private String name;
 
 	@Column
@@ -38,17 +38,17 @@ public class Draw {
 	@Column
 	private Instant lastModifiedInstant;
 
-	@NotNull
-	@Future
+	@NotNull(message="The draw instant cannot be null")
+	@FutureOrPresent(message="The draw instant must be in the present or in the future")
 	@Column
 	private Instant drawInstant;
 
-	@NotNull
-	@Min(1)
+	@NotNull(message="The number of selected elements cannot be null")
+	@Min(value=1, message="The number of selected elements must be higher or equal to 1") 
 	@Column
 	private int selectedElementsSize;
 
-	@NotEmpty
+	@NotEmpty(message="The raffle elements set cannot be null")
 	@ElementCollection
 	private Set<String> raffleElements;
 

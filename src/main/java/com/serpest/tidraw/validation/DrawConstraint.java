@@ -11,12 +11,14 @@ import javax.validation.Payload;
 
 @Documented
 @Constraint(validatedBy = DrawValidator.class)
-@Target({ ElementType.TYPE})
+@Target({ElementType.TYPE})
 @Retention(RetentionPolicy.RUNTIME)
 public @interface DrawConstraint {
+
 	String message() default "Invalid draw";
 
-    Class<?>[] groups() default {};
+	Class<?>[] groups() default {};
 
-    Class<? extends Payload>[] payload() default {};
+	Class<? extends Payload>[] payload() default {};
+
 }

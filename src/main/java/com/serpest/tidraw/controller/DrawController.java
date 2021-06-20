@@ -6,6 +6,8 @@ import java.util.List;
 import java.util.Optional;
 
 import javax.validation.Valid;
+import javax.validation.constraints.FutureOrPresent;
+import javax.validation.constraints.NotNull;
 
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -26,6 +28,21 @@ import com.serpest.tidraw.repository.DrawRepository;
 @RestController
 public class DrawController {
 
+	/*
+	 * This class is used to simplify the method editDrawDrawInstant()
+	 */
+	private static class DrawDrawInstantPatch {
+
+		private DrawDrawInstantPatch(String text) {
+			drawInstant = Instant.parse(text);
+		}
+
+		@NotNull(message="The draw instant cannot be null")
+		@FutureOrPresent(message="The draw instant must be in the present or in the future")
+		private Instant drawInstant;
+
+	}
+
 	private final DrawRepository DRAW_REPOSITORY;
 
 	private final DrawExecutor DRAW_EXECUTOR;
@@ -40,7 +57,7 @@ public class DrawController {
 		return DRAW_REPOSITORY.findById(id).orElseThrow(() -> new DrawNotFoundException(id));
 	}
 
-	@GetMapping("/draws/{id}/selected")
+	@GetMapping("/draws/{id}/selected-elements")
 	public List<String> getDrawSelectedElements(@PathVariable long id) {
 		Draw draw = getDraw(id);
 		if (draw.getSelectedElements() == null)
@@ -65,7 +82,7 @@ public class DrawController {
 	}
 
 	@PutMapping("/draws/{id}")
-	public Draw replaceDraw(@PathVariable long id, @RequestBody Draw newDraw) {
+	public Draw replaceDraw(@PathVariable long id, @RequestBody @Valid Draw newDraw) {
 		return DRAW_REPOSITORY.findById(id).map(originalDraw -> {
 					if (!isThereEnoughTimeToEditDrawBeforeDrawExecution(originalDraw))
 						throw new EditingTimeLimitExceededException(id);
@@ -81,13 +98,10 @@ public class DrawController {
 				});
 	}
 
-	@PatchMapping("/draws/{id}")
-	public Draw editDrawInstant(@PathVariable long id, @RequestBody Instant newDrawInstant) { // TODO: Implement newDrawInstant validation
+	@PatchMapping("/draws/{id}/draw-instant")
+	public Draw editDrawDrawInstant(@PathVariable long id, @RequestBody @Valid DrawDrawInstantPatch drawDrawInstantPatch) {
 		Draw draw = getDraw(id);
-		if (draw.getDrawInstant().isBefore(Instant.now()))
-			throw new EditingTimeLimitExceededException(id);
-		draw.setDrawInstant(newDrawInstant);
-		DRAW_EXECUTOR.executeDraw(draw);
+		draw.setDrawInstant(drawDrawInstantPatch.drawInstant);
 		return DRAW_REPOSITORY.save(draw);
 	}
 
