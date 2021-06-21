@@ -117,14 +117,22 @@ public class Draw {
 	}
 
 	public List<String> getSelectedElements() {
-		if (drawInstant.isAfter(Instant.now()))
-			return null;
-		return selectedElements;
+		/*
+		 * The draw could be executed before the specified draw instant,
+		 * so it's important to hide the draw's selected elements before the specified draw instant
+		 */
+		if (hasBeenExecuted())
+			return selectedElements;
+		return null;
 	}
 
 	public void setSelectedElements(List<String> selectedElements) {
 		this.selectedElements = selectedElements;
 		setLastModifiedInstant(Instant.now());
+	}
+
+	public boolean hasBeenExecuted() {
+		return !drawInstant.isAfter(Instant.now());
 	}
 
 	private void setCreationInstant(Instant creationInstant) {

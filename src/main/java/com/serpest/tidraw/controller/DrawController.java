@@ -1,14 +1,20 @@
 package com.serpest.tidraw.controller;
 
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
+
 import java.time.Duration;
 import java.time.Instant;
-import java.util.List;
 import java.util.Optional;
 
 import javax.validation.Valid;
 import javax.validation.constraints.FutureOrPresent;
 import javax.validation.constraints.NotNull;
 
+import org.springframework.hateoas.CollectionModel;
+import org.springframework.hateoas.EntityModel;
+import org.springframework.hateoas.IanaLinkRelations;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -18,6 +24,7 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.serpest.tidraw.component.DrawModelAssembler;
 import com.serpest.tidraw.controller.exception.DrawNotFoundException;
 import com.serpest.tidraw.controller.exception.DrawNotYetExecutedException;
 import com.serpest.tidraw.controller.exception.EditingTimeLimitExceededException;
@@ -45,44 +52,56 @@ public class DrawController {
 
 	private final DrawRepository DRAW_REPOSITORY;
 
+	private final DrawModelAssembler DRAW_MODEL_ASSEMBLER;
+
 	private final DrawExecutor DRAW_EXECUTOR;
 
-	public DrawController(final DrawRepository DRAW_REPOSITORY) {
+	public DrawController(final DrawRepository DRAW_REPOSITORY, final DrawModelAssembler DRAW_MODEL_ASSEMBLER) {
 		this.DRAW_REPOSITORY = DRAW_REPOSITORY;
+		this.DRAW_MODEL_ASSEMBLER = DRAW_MODEL_ASSEMBLER;
 		DRAW_EXECUTOR = new DrawExecutor();
 	}
 
 	@GetMapping("/draws/{id}")
-	public Draw getDraw(@PathVariable long id) {
-		return DRAW_REPOSITORY.findById(id).orElseThrow(() -> new DrawNotFoundException(id));
+	public EntityModel<Draw> getDraw(@PathVariable long id) {
+		Draw draw = DRAW_REPOSITORY.findById(id).orElseThrow(() -> new DrawNotFoundException(id));
+		return DRAW_MODEL_ASSEMBLER.toModel(draw);
 	}
 
 	@GetMapping("/draws/{id}/selected-elements")
-	public List<String> getDrawSelectedElements(@PathVariable long id) {
-		Draw draw = getDraw(id);
-		if (draw.getSelectedElements() == null)
+	public CollectionModel<String> getDrawSelectedElements(@PathVariable long id) {
+		Draw draw = getDraw(id).getContent();
+		if (!draw.hasBeenExecuted())
 			throw new DrawNotYetExecutedException(id);
-		return draw.getSelectedElements();
+		CollectionModel<String> selectedElementsModel = CollectionModel.of(draw.getSelectedElements(),
+				DRAW_MODEL_ASSEMBLER.toModel(draw).getLinks().without(IanaLinkRelations.SELF));
+		selectedElementsModel.add(linkTo(methodOn(DrawController.class).getDrawSelectedElements(id)).withSelfRel());
+		selectedElementsModel.add(linkTo(methodOn(DrawController.class).getDraw(id)).withRel("draw"));
+		return selectedElementsModel;
 	}
 
 	@DeleteMapping("/draws/{id}")
-	public void deleteDraw(@PathVariable long id) {
+	public ResponseEntity<Object> deleteDraw(@PathVariable long id) {
 		Optional<Draw> optionalDraw = DRAW_REPOSITORY.findById(id);
 		if (optionalDraw.isPresent() &&
 			!isThereEnoughTimeToEditDrawBeforeDrawExecution(optionalDraw.get())) { // The draw has been already executed or the execution instant is near
 				throw new EditingTimeLimitExceededException(id);
 		}
 		DRAW_REPOSITORY.deleteById(id);
+		return ResponseEntity.noContent().build();
 	}
 
 	@PostMapping("/draws")
-	public Draw createDraw(@RequestBody @Valid Draw draw) {
+	public ResponseEntity<EntityModel<Draw>> createDraw(@RequestBody @Valid Draw draw) {
 		DRAW_EXECUTOR.executeDraw(draw); // The draw is executed immediately after receiving the draw and not at the specified draw instant
-		return DRAW_REPOSITORY.save(draw);
+		EntityModel<Draw> drawModel = DRAW_MODEL_ASSEMBLER.toModel(DRAW_REPOSITORY.save(draw));
+		return ResponseEntity
+				.created(drawModel.getRequiredLink(IanaLinkRelations.SELF).toUri())
+				.body(drawModel);
 	}
 
 	@PutMapping("/draws/{id}")
-	public Draw replaceDraw(@PathVariable long id, @RequestBody @Valid Draw newDraw) {
+	public ResponseEntity<EntityModel<Draw>> replaceDraw(@PathVariable long id, @RequestBody @Valid Draw newDraw) {
 		return DRAW_REPOSITORY.findById(id).map(originalDraw -> {
 					if (!isThereEnoughTimeToEditDrawBeforeDrawExecution(originalDraw))
 						throw new EditingTimeLimitExceededException(id);
@@ -91,7 +110,10 @@ public class DrawController {
 					originalDraw.setSelectedElementsSize(newDraw.getSelectedElementsSize());
 					originalDraw.setRaffleElements(newDraw.getRaffleElements());
 					DRAW_EXECUTOR.executeDraw(originalDraw);
-					return DRAW_REPOSITORY.save(originalDraw);
+					EntityModel<Draw> originalDrawModel = DRAW_MODEL_ASSEMBLER.toModel(DRAW_REPOSITORY.save(originalDraw));
+					return ResponseEntity
+							.created(originalDrawModel.getRequiredLink(IanaLinkRelations.SELF).toUri())
+							.body(originalDrawModel);
 				})
 				.orElseGet(() -> {
 					return createDraw(newDraw);
@@ -99,10 +121,13 @@ public class DrawController {
 	}
 
 	@PatchMapping("/draws/{id}/draw-instant")
-	public Draw editDrawDrawInstant(@PathVariable long id, @RequestBody @Valid DrawDrawInstantPatch drawDrawInstantPatch) {
-		Draw draw = getDraw(id);
+	public ResponseEntity<EntityModel<Draw>> editDrawDrawInstant(@PathVariable long id, @RequestBody @Valid DrawDrawInstantPatch drawDrawInstantPatch) {
+		Draw draw = getDraw(id).getContent();
 		draw.setDrawInstant(drawDrawInstantPatch.drawInstant);
-		return DRAW_REPOSITORY.save(draw);
+		EntityModel<Draw> drawModel = DRAW_MODEL_ASSEMBLER.toModel(DRAW_REPOSITORY.save(draw));
+		return ResponseEntity
+				.created(drawModel.getRequiredLink(IanaLinkRelations.SELF).toUri())
+				.body(drawModel);
 	}
 
 	private boolean isThereEnoughTimeToEditDrawBeforeDrawExecution(Draw draw) {
