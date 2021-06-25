@@ -8,8 +8,7 @@ import java.time.Instant;
 import java.util.Optional;
 
 import javax.validation.Valid;
-import javax.validation.constraints.FutureOrPresent;
-import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Future;
 
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.EntityModel;
@@ -22,6 +21,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.serpest.tidraw.component.DrawModelAssembler;
@@ -33,6 +33,7 @@ import com.serpest.tidraw.model.DrawExecutor;
 import com.serpest.tidraw.repository.DrawRepository;
 
 @RestController
+@RequestMapping("/api")
 public class DrawController {
 
 	/*
@@ -44,8 +45,7 @@ public class DrawController {
 			drawInstant = Instant.parse(text);
 		}
 
-		@NotNull(message="The draw instant cannot be null")
-		@FutureOrPresent(message="The draw instant must be in the present or in the future")
+		@Future(message="The draw instant must be in the future")
 		private Instant drawInstant;
 
 	}

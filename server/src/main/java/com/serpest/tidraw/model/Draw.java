@@ -10,7 +10,7 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.validation.constraints.FutureOrPresent;
+import javax.validation.constraints.Future;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotEmpty;
@@ -38,8 +38,7 @@ public class Draw {
 	@Column
 	private Instant lastModifiedInstant;
 
-	@NotNull(message="The draw instant cannot be null")
-	@FutureOrPresent(message="The draw instant must be in the present or in the future")
+	@Future(message="The draw instant must be in the future")
 	@Column
 	private Instant drawInstant;
 
@@ -132,6 +131,8 @@ public class Draw {
 	}
 
 	public boolean hasBeenExecuted() {
+		if (drawInstant == null)
+			return true;
 		return !drawInstant.isAfter(Instant.now());
 	}
 
