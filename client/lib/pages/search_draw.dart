@@ -41,7 +41,7 @@ class _SearchDrawPageState extends State<SearchDrawPage> {
         icon: Icon(Icons.search),
         label: Text("Search"),
         onPressed: () {
-          if (_formKey.currentState!.validate()) {
+          if (_formKey.currentState != null && _formKey.currentState!.validate()) {
             Navigator.pushNamed(context, '/draw/' + idController.text);
           }
         },

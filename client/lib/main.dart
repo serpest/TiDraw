@@ -24,7 +24,7 @@ class App extends StatelessWidget {
       },
       onGenerateRoute: (settings)  {
         final regex = RegExp(r'\' + DrawPage.route + r'\/[a-zA-Z0-9]+$');
-        if (regex.hasMatch(settings.name!)) {
+        if (settings.name != null && regex.hasMatch(settings.name!)) {
           String id = settings.name!.substring(settings.name!.lastIndexOf('/') + 1);   
           return MaterialPageRoute(
             builder: (context) {

@@ -19,7 +19,7 @@ class _DrawPageState extends State<DrawPage> {
   @override
   void initState() {
     super.initState();
-    futureDraw = fetchDraw(widget.id);
+    futureDraw = getDraw(widget.id);
   }
 
   @override
@@ -35,7 +35,12 @@ class _DrawPageState extends State<DrawPage> {
           builder: (context, snapshot) {
             if (snapshot.hasData) {
               // TODO
-              return Text("Not yet implemented");
+              return Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text("Not yet implemented"),
+                ],
+              );
             } else if (snapshot.hasError) {
               return Text(snapshot.error.toString());
             }
