@@ -42,7 +42,7 @@ class _SearchDrawPageState extends State<SearchDrawPage> {
         label: Text("Search"),
         onPressed: () {
           if (_formKey.currentState!.validate()) {
-            Navigator.pushNamed(context, '/draw', arguments: idController.text);
+            Navigator.pushNamed(context, '/draw/' + idController.text);
           }
         },
       ),

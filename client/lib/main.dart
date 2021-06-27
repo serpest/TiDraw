@@ -23,11 +23,14 @@ class App extends StatelessWidget {
         SearchDrawPage.route: (context) => SearchDrawPage(),
       },
       onGenerateRoute: (settings)  {
-        if (settings.name == DrawPage.route) {
+        final regex = RegExp(r'\' + DrawPage.route + r'\/[a-zA-Z0-9]+$');
+        if (regex.hasMatch(settings.name!)) {
+          String id = settings.name!.substring(settings.name!.lastIndexOf('/') + 1);   
           return MaterialPageRoute(
             builder: (context) {
-              return DrawPage(id: settings.arguments as String);
+              return DrawPage(id: id);
             },
+            settings: settings,
           );
         }
       },
