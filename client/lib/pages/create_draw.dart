@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:tidraw/api.dart';
 import 'package:tidraw/model/draw.dart';
+import 'package:tidraw/pages/draw.dart';
 
 class CreateDrawPage extends StatefulWidget {
   static const route = '/create-draw';
@@ -16,16 +17,18 @@ class _CreateDrawPageState extends State<CreateDrawPage> {
   List<String> raffleElements = [];
 
   final nameController = TextEditingController();
-  final dateController = TextEditingController();
-  final timeController = TextEditingController();
+  final drawDateController = TextEditingController();
+  final drawTimeController = TextEditingController();
   final selectedElementsSizeController = TextEditingController();
   final addRaffleElementController = TextEditingController();
 
   @override
   void dispose() {
     nameController.dispose();
-    dateController.dispose();
-    timeController.dispose();
+    drawDateController.dispose();
+    drawTimeController.dispose();
+    selectedElementsSizeController.dispose();
+    addRaffleElementController.dispose();
     super.dispose();
   }
 
@@ -73,7 +76,7 @@ class _CreateDrawPageState extends State<CreateDrawPage> {
                       }
                       return null;
                     },
-                    controller: dateController,
+                    controller: drawDateController,
                     onTap: () async {
                       DateTime? date = await showDatePicker(
                         context: context,
@@ -82,7 +85,7 @@ class _CreateDrawPageState extends State<CreateDrawPage> {
                         lastDate: DateTime(2100, 12, 31),
                       );
                       if (date != null) {
-                        dateController.text = DateFormat('yyyy-MM-dd').format(date);
+                        drawDateController.text = DateFormat('yyyy-MM-dd').format(date);
                       }
                     },
                   ),
@@ -100,14 +103,14 @@ class _CreateDrawPageState extends State<CreateDrawPage> {
                       }
                       return null;
                     },
-                    controller: timeController,
+                    controller: drawTimeController,
                     onTap: () async {
                       TimeOfDay? time = await showTimePicker(
                         context: context,
                         initialTime: TimeOfDay.now(),
                       );
                       if (time != null) {
-                        timeController.text = time.hour.toString().padLeft(2, '0') + ':' + time.minute.toString().padLeft(2, '0'); // Raw, but effective. Apparently there isn't a way to format TimeOfDay using only a pattern string
+                        drawTimeController.text = time.hour.toString().padLeft(2, '0') + ':' + time.minute.toString().padLeft(2, '0'); // Raw, but effective. Apparently there isn't a way to format TimeOfDay using only a string pattern
                       }
                     },
                   ),
@@ -175,8 +178,8 @@ class _CreateDrawPageState extends State<CreateDrawPage> {
                   ),
                   ElevatedButton(
                     onPressed: () {
-                      newElementName = addRaffleElementController.text;
                       Navigator.pop(context);
+                      newElementName = addRaffleElementController.text;
                       addRaffleElementController.clear();
                     },
                     child: Text('Ok')
@@ -199,15 +202,16 @@ class _CreateDrawPageState extends State<CreateDrawPage> {
           if (_formKey.currentState != null && _formKey.currentState!.validate()) {
             Draw formDraw = Draw(
               name: nameController.text,
-              drawInstant: (dateController.text.isNotEmpty && timeController.text.isNotEmpty) ? DateTime.parse(dateController.text + 'T' + timeController.text + ':00Z') : null,
+              drawInstant: (drawDateController.text.isNotEmpty && drawTimeController.text.isNotEmpty) ? DateTime.parse(drawDateController.text + ' ' + drawTimeController.text) : null,
               selectedElementsSize: int.parse(selectedElementsSizeController.text),
-              raffleElements: raffleElements.toList(),
+              raffleElements: raffleElements,
             );
             try {
               Draw createdDraw = await putDraw(formDraw);
-              Navigator.pushNamed(context, '/draw/' + createdDraw.id.toString());
-            } on Exception catch(exc) {
-              ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(exc.toString())));
+              Navigator.pushNamed(context, DrawPage.route + '/' + createdDraw.id.toString());
+            } on Exception {
+              // TODO
+              ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Failed to create draw')));
             }
           }
         },

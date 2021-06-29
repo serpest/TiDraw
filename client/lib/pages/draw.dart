@@ -38,7 +38,6 @@ class _DrawPageState extends State<DrawPage> {
               return Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  // TODO
                   Text("Name: " + snapshot.data!.name),
                   Text("Creation instant: " + snapshot.data!.creationInstant.toString()),
                   Text("Last modified instant: " + snapshot.data!.lastModifiedInstant.toString()),
@@ -49,6 +48,7 @@ class _DrawPageState extends State<DrawPage> {
                 ],
               );
             } else if (snapshot.hasError) {
+              // TODO
               return Text(snapshot.error.toString());
             }
             return CircularProgressIndicator();

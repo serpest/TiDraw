@@ -15,7 +15,7 @@ class Draw {
     required this.name,
     this.creationInstant,
     this.lastModifiedInstant,
-    required this.drawInstant,
+    this.drawInstant,
     required this.selectedElementsSize,
     required this.raffleElements,
     this.selectedElements,
@@ -25,12 +25,12 @@ class Draw {
     return Draw(
       id: json['id'],
       name: json['name'],
-      creationInstant: DateTime.parse(json['creationInstant']),
-      lastModifiedInstant: DateTime.parse(json['lastModifiedInstant']),
+      creationInstant: (json['creationInstant'] != null) ? DateTime.parse(json['creationInstant']) : null,
+      lastModifiedInstant: (json['lastModifiedInstant'] != null) ? DateTime.parse(json['lastModifiedInstant']) : null,
       drawInstant: (json['drawInstant'] != null) ? DateTime.parse(json['drawInstant']) : null,
       selectedElementsSize: json['selectedElementsSize'],
-      raffleElements: json['raffleElements'].map<String>((element) => element as String).toList(),
-      selectedElements: (json['selectedElements'] != null) ? json['selectedElements'].map<String>((element) => element as String).toList() : null,
+      raffleElements: json['raffleElements'].cast<String>(),
+      selectedElements: (json['selectedElements'] != null) ? json['selectedElements'].cast<String>() : null,
     );
   }
 
@@ -38,9 +38,9 @@ class Draw {
     return {
       'id': id,
       'name': name,
-      'creationInstant': (creationInstant != null) ? DateFormat('YYYY-MM-DD''T''HH:mm:ss.SSS''Z').format(creationInstant!) : null,
-      'lastModifiedInstant': (lastModifiedInstant != null) ? DateFormat('YYYY-MM-DD''T''HH:mm:ss.SSS''Z').format(lastModifiedInstant!) : null,
-      'drawInstant': (drawInstant != null) ? DateFormat('YYYY-MM-DD''T''HH:mm:ss.SSS''Z').format(drawInstant!) : null,
+      'creationInstant': (creationInstant != null) ? DateFormat('yyyy-MM-ddTHH:mm:ss.SSSZ').format(creationInstant!) : null,
+      'lastModifiedInstant': (lastModifiedInstant != null) ? DateFormat('yyyy-MM-ddTHH:mm:ss.SSSZ').format(lastModifiedInstant!) : null,
+      'drawInstant': (drawInstant != null) ? DateFormat('yyyy-MM-ddTHH:mm:ss.SSSZ').format(drawInstant!) : null,
       'selectedElementsSize': selectedElementsSize,
       'raffleElements': raffleElements,
       'selectedElements': selectedElements,

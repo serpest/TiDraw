@@ -22,10 +22,11 @@ class App extends StatelessWidget {
         CreateDrawPage.route: (context) => CreateDrawPage(),
         SearchDrawPage.route: (context) => SearchDrawPage(),
       },
-      onGenerateRoute: (settings)  {
+      onGenerateRoute: (settings) {
+        // DrawPage.route generation
         final regex = RegExp(r'\' + DrawPage.route + r'\/[a-zA-Z0-9]+$');
         if (settings.name != null && regex.hasMatch(settings.name!)) {
-          String id = settings.name!.substring(settings.name!.lastIndexOf('/') + 1);   
+          String id = settings.name!.substring(settings.name!.lastIndexOf('/') + 1);
           return MaterialPageRoute(
             builder: (context) {
               return DrawPage(id: id);

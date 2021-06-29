@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:tidraw/pages/draw.dart';
 
 class SearchDrawPage extends StatefulWidget {
   static const route = '/search-draw';
@@ -42,7 +43,7 @@ class _SearchDrawPageState extends State<SearchDrawPage> {
         label: Text("Search"),
         onPressed: () {
           if (_formKey.currentState != null && _formKey.currentState!.validate()) {
-            Navigator.pushNamed(context, '/draw/' + idController.text);
+            Navigator.pushNamed(context, DrawPage.route + '/' + idController.text);
           }
         },
       ),

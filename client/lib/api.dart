@@ -8,6 +8,7 @@ Future<Draw> getDraw(String id) async {
   if (response.statusCode == 200) {
     return Draw.fromJson(jsonDecode(response.body));
   } else {
+    // TODO
     throw Exception('Failed to load draw');
   }
 }
@@ -23,6 +24,7 @@ Future<Draw> putDraw(Draw draw) async {
   if (response.statusCode == 200) {
     return Draw.fromJson(jsonDecode(response.body));
   } else {
+    // TODO
     throw Exception('Failed to create draw');
   }
 }
