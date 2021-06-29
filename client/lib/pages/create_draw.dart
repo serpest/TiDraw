@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:http/http.dart';
 import 'package:intl/intl.dart';
 import 'package:tidraw/api.dart';
 import 'package:tidraw/model/draw.dart';
@@ -198,15 +197,15 @@ class _CreateDrawPageState extends State<CreateDrawPage> {
         label: Text("Submit"),
         onPressed: () async {
           if (_formKey.currentState != null && _formKey.currentState!.validate()) {
-            String name = nameController.text;
-            String? drawInstant;
-            if (dateController.text.isNotEmpty && timeController.text.isNotEmpty) {
-              drawInstant = dateController.text + 'T' + timeController.text + ':00Z';
-            }
-            int selectedElementsSize = int.parse(selectedElementsSizeController.text);
+            Draw formDraw = Draw(
+              name: nameController.text,
+              drawInstant: (dateController.text.isNotEmpty && timeController.text.isNotEmpty) ? DateTime.parse(dateController.text + 'T' + timeController.text + ':00Z') : null,
+              selectedElementsSize: int.parse(selectedElementsSizeController.text),
+              raffleElements: raffleElements.toList(),
+            );
             try {
-              Draw draw = await putDraw(name, drawInstant, selectedElementsSize, raffleElements);
-              Navigator.pushNamed(context, '/draw/' + draw.id);
+              Draw createdDraw = await putDraw(formDraw);
+              Navigator.pushNamed(context, '/draw/' + createdDraw.id.toString());
             } on Exception catch(exc) {
               ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(exc.toString())));
             }

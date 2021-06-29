@@ -12,18 +12,13 @@ Future<Draw> getDraw(String id) async {
   }
 }
 
-Future<Draw> putDraw(String name, String? drawInstant, int selectedElementsSize, List<String> raffleElements) async {
+Future<Draw> putDraw(Draw draw) async {
   final response = await http.post(
     Uri.parse('http://localhost:8080/api/draws'),
     headers: <String, String>{
       'Content-Type': 'application/json; charset=UTF-8',
     },
-    body: jsonEncode(<String, Object?>{
-      'name': name,
-      'drawInstant': drawInstant,
-      'selectedElementsSize': selectedElementsSize,
-      'raffleElements': raffleElements,
-    }),
+    body: jsonEncode(draw),
   );
   if (response.statusCode == 200) {
     return Draw.fromJson(jsonDecode(response.body));

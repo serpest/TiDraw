@@ -38,7 +38,14 @@ class _DrawPageState extends State<DrawPage> {
               return Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Text("Not yet implemented"),
+                  // TODO
+                  Text("Name: " + snapshot.data!.name),
+                  Text("Creation instant: " + snapshot.data!.creationInstant.toString()),
+                  Text("Last modified instant: " + snapshot.data!.lastModifiedInstant.toString()),
+                  Text("Draw instant: " + snapshot.data!.drawInstant.toString()),
+                  Text("Number of selected elements: " + snapshot.data!.selectedElementsSize.toString()),
+                  Text("Raffle elements: " + snapshot.data!.raffleElements.toString()),
+                  Text("Selected elements: " + snapshot.data!.selectedElements.toString()),
                 ],
               );
             } else if (snapshot.hasError) {
