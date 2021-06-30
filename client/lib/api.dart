@@ -21,7 +21,7 @@ Future<Draw> putDraw(Draw draw) async {
     },
     body: jsonEncode(draw),
   );
-  if (response.statusCode == 200) {
+  if (response.statusCode == 201) {
     return Draw.fromJson(jsonDecode(response.body));
   } else {
     // TODO
