@@ -1,5 +1,3 @@
-import 'package:intl/intl.dart';
-
 class Draw {
   final int? id;
   final String name;
@@ -38,9 +36,9 @@ class Draw {
     return {
       'id': id,
       'name': name,
-      'creationInstant': (creationInstant != null) ? DateFormat('yyyy-MM-ddTHH:mm:ss.SSSZ').format(creationInstant!) : null,
-      'lastModifiedInstant': (lastModifiedInstant != null) ? DateFormat('yyyy-MM-ddTHH:mm:ss.SSSZ').format(lastModifiedInstant!) : null,
-      'drawInstant': (drawInstant != null) ? DateFormat('yyyy-MM-ddTHH:mm:ss.SSSZ').format(drawInstant!) : null,
+      'creationInstant': (creationInstant != null) ? creationInstant!.toUtc().toIso8601String() : null,
+      'lastModifiedInstant': (lastModifiedInstant != null) ? lastModifiedInstant!.toUtc().toIso8601String() : null,
+      'drawInstant': (drawInstant != null) ? drawInstant!.toUtc().toIso8601String() : null,
       'selectedElementsSize': selectedElementsSize,
       'raffleElements': raffleElements,
       'selectedElements': selectedElements,
