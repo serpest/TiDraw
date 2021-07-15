@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:tidraw/api.dart';
 import 'package:tidraw/model/draw.dart';
 
@@ -34,18 +35,107 @@ class _DrawPageState extends State<DrawPage> {
           future: futureDraw,
           builder: (context, snapshot) {
             if (snapshot.hasData) {
-              // TODO
-              return Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text("Name: " + snapshot.data!.name),
-                  Text("Creation instant: " + snapshot.data!.creationInstant.toString()),
-                  Text("Last modified instant: " + snapshot.data!.lastModifiedInstant.toString()),
-                  Text("Draw instant: " + snapshot.data!.drawInstant.toString()),
-                  Text("Number of selected elements: " + snapshot.data!.selectedElementsSize.toString()),
-                  Text("Raffle elements: " + snapshot.data!.raffleElements.toString()),
-                  Text("Selected elements: " + snapshot.data!.selectedElements.toString()),
-                ],
+              String creationInstantStr = (snapshot.data!.creationInstant != null) ?
+                DateFormat('yyyy-MM-dd HH:mm:ss').format(snapshot.data!.creationInstant!.toLocal()) : 'Unknown';
+              String lastModifiedInstantStr = (snapshot.data!.lastModifiedInstant != null) ?
+                DateFormat('yyyy-MM-dd HH:mm:ss').format(snapshot.data!.lastModifiedInstant!.toLocal()) : 'Unknown';
+              String drawInstantStr = (snapshot.data!.drawInstant != null) ?
+                DateFormat('yyyy-MM-dd HH:mm:ss').format(snapshot.data!.drawInstant!.toLocal()) : lastModifiedInstantStr;
+              return Padding(
+                padding: EdgeInsets.all(8.0),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    TextFormField(
+                      decoration: InputDecoration(
+                        icon: Icon(Icons.label),
+                        labelText: "Name",
+                      ),
+                      initialValue: snapshot.data!.name,
+                      enabled: false,
+                    ),
+                    TextFormField(
+                      decoration: InputDecoration(
+                        icon: Icon(Icons.access_time),
+                        labelText: "Creation instant",
+                      ),
+                      initialValue: creationInstantStr,
+                      enabled: false,
+                    ),
+                    TextFormField(
+                      decoration: InputDecoration(
+                        icon: Icon(Icons.access_time),
+                        labelText: "Last modified instant",
+                      ),
+                      initialValue: lastModifiedInstantStr,
+                      enabled: false,
+                    ),
+                    TextFormField(
+                      decoration: InputDecoration(
+                        icon: Icon(Icons.access_time),
+                        labelText: "Draw instant",
+                      ),
+                      initialValue: drawInstantStr,
+                      enabled: false,
+                    ),
+                    TextFormField(
+                      decoration: InputDecoration(
+                        icon: Icon(Icons.star),
+                        labelText: "Number of selected elements",
+                      ),
+                      initialValue: snapshot.data!.selectedElementsSize.toString(),
+                      enabled: false,
+                    ),
+                    Divider(
+                      height: 32.0,
+                    ),
+                    Text('Raffle elements'),
+                    Expanded(
+                      child: ListView.builder(
+                        padding: EdgeInsets.all(8.0),
+                        itemCount: snapshot.data!.raffleElements.length,
+                        itemBuilder: (context, index) {
+                          return Card(
+                            child: ListTile(
+                              title: Text(snapshot.data!.raffleElements[index]),
+                              leading: Text((index + 1).toString() + '.'),
+                            ),
+                          );
+                        },
+                      ),
+                    ),
+                    Divider(
+                      height: 32.0,
+                    ),
+                    Text('Selected elements'),
+                    Expanded(
+                      child: (snapshot.data!.selectedElements != null) ? 
+                        ListView.builder(
+                          padding: EdgeInsets.all(8.0),
+                          itemCount: snapshot.data!.selectedElements!.length,
+                          itemBuilder: (context, index) {
+                            return Card(
+                              child: ListTile(
+                                title: Text(snapshot.data!.selectedElements![index]),
+                                leading: Text((index + 1).toString() + '.'),
+                              ),
+                            );
+                          },
+                        ) :
+                        Center(
+                          child: Card(
+                            child: ListTile(
+                              title: Text(getDurationBiggestOrderTermStr(snapshot.data!.drawInstant!.difference(DateTime.now())) + ' to the draw execution'),
+                              leading: Icon(
+                                Icons.warning_amber_outlined,
+                                color: Theme.of(context).errorColor,
+                              ),
+                            ),
+                          ),
+                        ),
+                    ),
+                  ],
+                ),
               );
             } else if (snapshot.hasError) {
               // TODO
@@ -56,5 +146,18 @@ class _DrawPageState extends State<DrawPage> {
         ),
       ),
     );
+  }
+
+  String getDurationBiggestOrderTermStr(Duration duration) {
+    if (duration.inDays > 0) {
+      return 'Less then ' + (duration.inDays + 1).toString() + ' days';
+    } else if (duration.inHours > 0) {
+      return 'Less then ' + (duration.inHours + 1).toString() + ' hours';
+    } else if (duration.inMinutes > 0) {
+      return 'Less then ' + (duration.inMinutes + 1).toString() + ' minutes';
+    } else if (duration.inSeconds > 0) {
+      return duration.inSeconds.toString() + ' seconds';
+    } 
+    return 'Less then a second';
   }
 }

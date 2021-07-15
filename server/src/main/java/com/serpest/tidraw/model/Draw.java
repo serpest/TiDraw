@@ -17,6 +17,8 @@ import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonProperty.Access;
 import com.serpest.tidraw.validation.DrawConstraint;
 
 @DrawConstraint(message="The number of selected elements must be less then or equal to the number of the raffle elements")
@@ -33,9 +35,11 @@ public class Draw {
 	private String name;
 
 	@Column
+	@JsonProperty(access = Access.READ_ONLY)
 	private Instant creationInstant;
 
 	@Column
+	@JsonProperty(access = Access.READ_ONLY)
 	private Instant lastModifiedInstant;
 
 	@Future(message="The draw instant must be in the future")

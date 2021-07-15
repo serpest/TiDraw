@@ -141,16 +141,24 @@ class _CreateDrawPageState extends State<CreateDrawPage> {
           ),
           Text('Raffle elements'),
           Expanded(
-            child: ListView(
-              padding: const EdgeInsets.all(8),
-              children: [
-                Column(
-                  children: raffleElements.map((element) => ListTile(
-                    title: Text(element),
-                    leading: Icon(Icons.circle),
-                  )).toList(),
-                ),
-              ],
+            child: ListView.builder(
+              padding: EdgeInsets.all(8.0),
+              itemCount: raffleElements.length,
+              itemBuilder: (context, index) {
+                return Card(
+                  child: ListTile(
+                    title: Text(raffleElements[index]),
+                    leading: Text((index + 1).toString() + '.'),
+                    trailing: IconButton(
+                      icon: Icon(Icons.delete),
+                      onPressed: () => setState(() {
+                        raffleElements.removeAt(index);
+                      }),
+                      tooltip: 'Remove element',
+                    ),
+                  ),
+                );
+              },
             ),
           ),
         ],
