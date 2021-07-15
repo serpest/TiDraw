@@ -65,13 +65,13 @@ public class DrawController {
 	}
 
 	@GetMapping("/draws/{id}")
-	public EntityModel<Draw> getDraw(@PathVariable long id) {
+	public EntityModel<Draw> getDraw(@PathVariable String id) {
 		Draw draw = DRAW_REPOSITORY.findById(id).orElseThrow(() -> new DrawNotFoundException(id));
 		return DRAW_MODEL_ASSEMBLER.toModel(draw);
 	}
 
 	@GetMapping("/draws/{id}/selected-elements")
-	public CollectionModel<String> getDrawSelectedElements(@PathVariable long id) {
+	public CollectionModel<String> getDrawSelectedElements(@PathVariable String id) {
 		Draw draw = getDraw(id).getContent();
 		if (!draw.hasBeenExecuted())
 			throw new DrawNotYetExecutedException(id);
@@ -83,7 +83,7 @@ public class DrawController {
 	}
 
 	@DeleteMapping("/draws/{id}")
-	public ResponseEntity<Object> deleteDraw(@PathVariable long id) {
+	public ResponseEntity<Object> deleteDraw(@PathVariable String id) {
 		Optional<Draw> optionalDraw = DRAW_REPOSITORY.findById(id);
 		if (optionalDraw.isPresent() &&
 			!isThereEnoughTimeToEditDrawBeforeDrawExecution(optionalDraw.get())) { // The draw has been already executed or the execution instant is near
@@ -103,7 +103,7 @@ public class DrawController {
 	}
 
 	@PutMapping("/draws/{id}")
-	public ResponseEntity<EntityModel<Draw>> replaceDraw(@PathVariable long id, @RequestBody @Valid Draw newDraw) {
+	public ResponseEntity<EntityModel<Draw>> replaceDraw(@PathVariable String id, @RequestBody @Valid Draw newDraw) {
 		return DRAW_REPOSITORY.findById(id).map(originalDraw -> {
 					if (!isThereEnoughTimeToEditDrawBeforeDrawExecution(originalDraw))
 						throw new EditingTimeLimitExceededException(id);
@@ -123,7 +123,7 @@ public class DrawController {
 	}
 
 	@PatchMapping("/draws/{id}/draw-instant")
-	public ResponseEntity<EntityModel<Draw>> editDrawDrawInstant(@PathVariable long id, @RequestBody @Valid DrawDrawInstantPatch drawDrawInstantPatch) {
+	public ResponseEntity<EntityModel<Draw>> editDrawDrawInstant(@PathVariable String id, @RequestBody @Valid DrawDrawInstantPatch drawDrawInstantPatch) {
 		Draw draw = getDraw(id).getContent();
 		draw.setDrawInstant(drawDrawInstantPatch.drawInstant);
 		EntityModel<Draw> drawModel = DRAW_MODEL_ASSEMBLER.toModel(DRAW_REPOSITORY.save(draw));

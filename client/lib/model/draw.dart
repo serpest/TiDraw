@@ -1,5 +1,5 @@
 class Draw {
-  final int? id;
+  final String? id;
   final String name;
 	final DateTime? creationInstant;
   final DateTime? lastModifiedInstant;

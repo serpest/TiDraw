@@ -4,7 +4,7 @@ public class EditingTimeLimitExceededException extends RuntimeException {
 
 	private static final long serialVersionUID = -7601423435024823464L;
 
-	public EditingTimeLimitExceededException(long id) {
+	public EditingTimeLimitExceededException(String id) {
 		super("Draw " + id + " not editable anymore because of time limit exceeded");
 	}
 

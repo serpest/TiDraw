@@ -4,7 +4,7 @@ public class DrawNotFoundException extends RuntimeException {
 
 	private static final long serialVersionUID = 8778720373997116580L;
 
-	public DrawNotFoundException(long id) {
+	public DrawNotFoundException(String id) {
 		super("Draw " + id + " not found");
 	}
 

@@ -4,6 +4,6 @@ import org.springframework.data.repository.CrudRepository;
 
 import com.serpest.tidraw.model.Draw;
 
-public interface DrawRepository extends CrudRepository<Draw, Long> {
+public interface DrawRepository extends CrudRepository<Draw, String> {
 	
 }
