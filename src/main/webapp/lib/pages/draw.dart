@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:tidraw/api.dart';
+import 'package:tidraw/api.dart' as api;
 import 'package:tidraw/model/draw.dart';
 
 class DrawPage extends StatefulWidget {
-  static const route = "/draw";
+  static const route = '/draw';
 
   final String id;
 
@@ -49,7 +49,7 @@ class _DrawPageState extends State<DrawPage> {
                     TextFormField(
                       decoration: InputDecoration(
                         icon: Icon(Icons.label),
-                        labelText: "Name",
+                        labelText: 'Name',
                       ),
                       initialValue: snapshot.data!.name,
                       enabled: false,
@@ -57,7 +57,7 @@ class _DrawPageState extends State<DrawPage> {
                     TextFormField(
                       decoration: InputDecoration(
                         icon: Icon(Icons.access_time),
-                        labelText: "Creation instant",
+                        labelText: 'Creation instant',
                       ),
                       initialValue: creationInstantStr,
                       enabled: false,
@@ -65,7 +65,7 @@ class _DrawPageState extends State<DrawPage> {
                     TextFormField(
                       decoration: InputDecoration(
                         icon: Icon(Icons.access_time),
-                        labelText: "Last modified instant",
+                        labelText: 'Last modified instant',
                       ),
                       initialValue: lastModifiedInstantStr,
                       enabled: false,
@@ -73,7 +73,7 @@ class _DrawPageState extends State<DrawPage> {
                     TextFormField(
                       decoration: InputDecoration(
                         icon: Icon(Icons.access_time),
-                        labelText: "Draw instant",
+                        labelText: 'Draw instant',
                       ),
                       initialValue: drawInstantStr,
                       enabled: false,
@@ -81,7 +81,7 @@ class _DrawPageState extends State<DrawPage> {
                     TextFormField(
                       decoration: InputDecoration(
                         icon: Icon(Icons.star),
-                        labelText: "Number of selected elements",
+                        labelText: 'Number of selected elements',
                       ),
                       initialValue: snapshot.data!.selectedElementsSize.toString(),
                       enabled: false,
@@ -125,7 +125,7 @@ class _DrawPageState extends State<DrawPage> {
                         Center(
                           child: Card(
                             child: ListTile(
-                              title: Text(getDurationBiggestOrderTermStr(snapshot.data!.drawInstant!.difference(DateTime.now())) + ' to the draw execution'),
+                              title: Text(getDurationStrAndScheduleNextViewRefresh(snapshot.data!.drawInstant!.difference(DateTime.now())) + ' to the draw execution'),
                               leading: Icon(
                                 Icons.warning_amber_outlined,
                                 color: Theme.of(context).errorColor,
@@ -138,8 +138,12 @@ class _DrawPageState extends State<DrawPage> {
                 ),
               );
             } else if (snapshot.hasError) {
-              // TODO
-              return Text(snapshot.error.toString());
+              if (snapshot.error is api.ApiException) {
+                return Text(snapshot.error.toString());
+              } else {
+                // TODO
+                return Text('Unknown error');
+              }
             }
             return CircularProgressIndicator();
           },
@@ -148,16 +152,30 @@ class _DrawPageState extends State<DrawPage> {
     );
   }
 
-  String getDurationBiggestOrderTermStr(Duration duration) {
+  Future<Draw> getDraw(String id) async {
+    Draw draw = await api.getDraw(widget.id);
+    if (draw.selectedElements == null) {
+      Future.delayed(draw.drawInstant!.difference(DateTime.now()), () => setState(() {
+                      futureDraw = api.getDraw(widget.id);
+                    }));
+    }
+    return draw;
+  }
+
+  String getDurationStrAndScheduleNextViewRefresh(Duration duration) {
     if (duration.inDays > 0) {
+      Future.delayed(Duration(hours: 2), () => setState(() {}));
       return 'Less then ' + (duration.inDays + 1).toString() + ' days';
     } else if (duration.inHours > 0) {
+      Future.delayed(Duration(minutes: 5), () => setState(() {}));
       return 'Less then ' + (duration.inHours + 1).toString() + ' hours';
     } else if (duration.inMinutes > 0) {
+      Future.delayed(Duration(seconds: 5), () => setState(() {}));
       return 'Less then ' + (duration.inMinutes + 1).toString() + ' minutes';
     } else if (duration.inSeconds > 0) {
+      Future.delayed(Duration(seconds: 1), () => setState(() {}));
       return duration.inSeconds.toString() + ' seconds';
-    } 
+    }
     return 'Less then a second';
   }
 }

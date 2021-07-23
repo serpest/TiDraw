@@ -26,7 +26,7 @@ class _SearchDrawPageState extends State<SearchDrawPage> {
           child: TextFormField(
             decoration: InputDecoration(
               icon: Icon(Icons.qr_code),
-              labelText: "Draw ID *",
+              labelText: 'Draw ID *',
             ),
             validator: (value) {
               if (value == null || value.isEmpty) {
@@ -40,7 +40,7 @@ class _SearchDrawPageState extends State<SearchDrawPage> {
       ),
       bottomNavigationBar: ElevatedButton.icon(
         icon: Icon(Icons.search),
-        label: Text("Search"),
+        label: Text('Search'),
         onPressed: () {
           if (_formKey.currentState != null && _formKey.currentState!.validate()) {
             Navigator.pushNamed(context, DrawPage.route + '/' + idController.text);

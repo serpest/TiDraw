@@ -1,4 +1,6 @@
+import 'dart:async';
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:http/http.dart' as http;
 import 'package:tidraw/model/draw.dart';
@@ -7,27 +9,52 @@ import 'package:tidraw/model/draw.dart';
 const String API_URL = String.fromEnvironment('API_URL');
 
 Future<Draw> getDraw(String id) async {
-  final response = await http.get(Uri.parse(API_URL + '/api/draws/' + id));
-  if (response.statusCode == 200) {
-    return Draw.fromJson(jsonDecode(response.body));
-  } else {
-    // TODO
-    throw Exception('Failed to load draw');
+  try {
+    final response = await http.get(Uri.parse(API_URL + '/api/draws/' + id));
+    if (response.statusCode == 200) {
+      return Draw.fromJson(jsonDecode(response.body));
+    } else if (response.statusCode == 404) {
+      throw ApiException('Draw not found');
+    } else {
+      // TODO
+      throw Exception('Failed to load draw');
+    }
+  } on TimeoutException {
+    throw ApiException('Connection timed out');
+  } on SocketException {
+    throw ApiException('Connection failed');
   }
 }
 
 Future<Draw> putDraw(Draw draw) async {
-  final response = await http.post(
-    Uri.parse(API_URL + '/api/draws'),
-    headers: <String, String>{
-      'Content-Type': 'application/json; charset=UTF-8',
-    },
-    body: jsonEncode(draw),
-  );
-  if (response.statusCode == 201) {
-    return Draw.fromJson(jsonDecode(response.body));
-  } else {
-    // TODO
-    throw Exception('Failed to create draw');
+  try {
+    final response = await http.post(
+      Uri.parse(API_URL + '/api/draws'),
+      headers: {
+        'Content-Type': 'application/json; charset=UTF-8',
+      },
+      body: jsonEncode(draw),
+    );
+    if (response.statusCode == 201) {
+      return Draw.fromJson(jsonDecode(response.body));
+    } else {
+      // TODO
+      throw ApiException('Failed to create draw');
+    }
+  } on TimeoutException {
+    throw ApiException('Connection timed out');
+  } on SocketException {
+    throw ApiException('Connection failed');
+  }
+}
+
+class ApiException implements Exception {
+  final String message;
+
+  ApiException(this.message);
+
+  @override
+  String toString() {
+    return message;
   }
 }

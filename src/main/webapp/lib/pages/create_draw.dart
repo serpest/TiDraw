@@ -52,7 +52,7 @@ class _CreateDrawPageState extends State<CreateDrawPage> {
                   TextFormField(
                     decoration: InputDecoration(
                       icon: Icon(Icons.label),
-                      labelText: "Name *",
+                      labelText: 'Name *',
                     ),
                     validator: (value) {
                       if (value == null || value.isEmpty || value.length > 280) {
@@ -65,7 +65,7 @@ class _CreateDrawPageState extends State<CreateDrawPage> {
                   TextFormField(
                     decoration: InputDecoration(
                       icon: Icon(Icons.date_range),
-                      labelText: "Draw date",
+                      labelText: 'Draw date',
                     ),
                     validator: (value) {
                       // TODO
@@ -92,7 +92,7 @@ class _CreateDrawPageState extends State<CreateDrawPage> {
                   TextFormField(
                     decoration: InputDecoration(
                       icon: Icon(Icons.access_time),
-                      labelText: "Draw time",
+                      labelText: 'Draw time',
                     ),
                     validator: (value) {
                       // TODO
@@ -117,7 +117,7 @@ class _CreateDrawPageState extends State<CreateDrawPage> {
                   TextFormField(
                     decoration: InputDecoration(
                       icon: Icon(Icons.star),
-                      labelText: "Number of elements to be selected *",
+                      labelText: 'Number of elements to be selected *',
                     ),
                     validator: (value) {
                       if (value == null || value.isEmpty) {
@@ -172,7 +172,7 @@ class _CreateDrawPageState extends State<CreateDrawPage> {
             context: context,
             builder: (BuildContext context) {
               return AlertDialog(
-                title: Text("Enter the new element name"),
+                title: Text('Enter the new element name'),
                 content: TextField(
                     controller: addRaffleElementController,
                 ),
@@ -205,7 +205,7 @@ class _CreateDrawPageState extends State<CreateDrawPage> {
       ),
       bottomNavigationBar: ElevatedButton.icon(
         icon: Icon(Icons.save),
-        label: Text("Submit"),
+        label: Text('Submit'),
         onPressed: () async {
           if (_formKey.currentState != null && _formKey.currentState!.validate()) {
             Draw formDraw = Draw(

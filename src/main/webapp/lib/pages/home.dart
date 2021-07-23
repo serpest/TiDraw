@@ -3,7 +3,7 @@ import 'package:tidraw/pages/create_draw.dart';
 import 'package:tidraw/pages/search_draw.dart';
 
 class HomePage extends StatelessWidget {
-  static const route = "/";
+  static const route = '/';
 
   @override
   Widget build(BuildContext context) {

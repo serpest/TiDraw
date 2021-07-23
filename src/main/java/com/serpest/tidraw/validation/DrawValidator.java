@@ -9,6 +9,8 @@ public class DrawValidator implements ConstraintValidator<DrawConstraint, Draw> 
 
 	@Override
 	public boolean isValid(Draw draw, ConstraintValidatorContext context) {
+		if (draw.getRaffleElements() == null)
+			return false;
 		return draw.getSelectedElementsSize() <= draw.getRaffleElements().size();
 	}
 
