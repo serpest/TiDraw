@@ -167,6 +167,7 @@ class _CreateDrawPageState extends State<CreateDrawPage> {
         child: Icon(Icons.add),
         tooltip: 'Add an element',
         onPressed: () async {
+          FocusScope.of(context).unfocus(); // On mobile it prevents showing the keyboard again focusing on the last selected field
           String? newElementName;
           await showDialog(
             context: context,
