@@ -3,11 +3,6 @@ package com.serpest.tidraw.model;
 import java.time.Instant;
 import java.util.List;
 
-import javax.persistence.Column;
-import javax.persistence.ElementCollection;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
 import javax.validation.constraints.Future;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;
@@ -15,50 +10,36 @@ import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
-import org.hibernate.annotations.GenericGenerator;
-
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonProperty.Access;
 import com.serpest.tidraw.validation.DrawConstraint;
 
 @DrawConstraint(message="The number of selected elements must be less then or equal to the number of the raffle elements")
-@Entity
 public class Draw {
 
-	@Id
-	@GeneratedValue(generator = "uuid.hex")
-	@GenericGenerator(name = "uuid.hex", strategy = "org.hibernate.id.UUIDHexGenerator") // UUIDHexGenerator returns a string of length 32
-	@Column(length = 32)
 	private String id;
 
-	@Column
 	@NotBlank(message="The draw's name must not be null and must contain at least one non-whitespace character")
 	@Size(min=1, max=280, message="The draw's name length must be between 1 and 280 characters")
 	private String name;
 
-	@Column
 	@JsonProperty(access = Access.READ_ONLY)
 	private Instant creationInstant;
 
-	@Column
 	@JsonProperty(access = Access.READ_ONLY)
 	private Instant lastModifiedInstant;
 
 	@Future(message="The draw instant must be in the future")
-	@Column
 	private Instant drawInstant;
 
 	@NotNull(message="The number of selected elements cannot be null")
 	@Min(value=1, message="The number of selected elements must be higher or equal to 1") 
-	@Column
 	private int selectedElementsSize;
 
 	// raffleElements is a list and not a set for performance reasons in DrawExecutor
 	@NotEmpty(message="The raffle elements list cannot be null")
-	@ElementCollection
 	private List<String> raffleElements;
 
-	@ElementCollection
 	private List<String> selectedElements;
 
 	public Draw() {

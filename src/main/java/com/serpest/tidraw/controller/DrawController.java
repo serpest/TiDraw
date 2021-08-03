@@ -38,9 +38,7 @@ import com.serpest.tidraw.repository.DrawRepository;
 @RequestMapping("/api")
 public class DrawController {
 
-	/*
-	 * This class is used to simplify the method editDrawDrawInstant()
-	 */
+	// This class is used to simplify the method editDrawDrawInstant()
 	private static class DrawDrawInstantPatch {
 
 		private DrawDrawInstantPatch(String text) {
