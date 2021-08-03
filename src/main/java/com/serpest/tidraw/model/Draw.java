@@ -2,7 +2,6 @@ package com.serpest.tidraw.model;
 
 import java.time.Instant;
 import java.util.List;
-import java.util.Set;
 
 import javax.persistence.Column;
 import javax.persistence.ElementCollection;
@@ -54,9 +53,10 @@ public class Draw {
 	@Column
 	private int selectedElementsSize;
 
-	@NotEmpty(message="The raffle elements set cannot be null")
+	// raffleElements is a list and not a set for performance reasons in DrawExecutor
+	@NotEmpty(message="The raffle elements list cannot be null")
 	@ElementCollection
-	private Set<String> raffleElements;
+	private List<String> raffleElements;
 
 	@ElementCollection
 	private List<String> selectedElements;
@@ -113,11 +113,11 @@ public class Draw {
 		setLastModifiedInstant(Instant.now());
 	}
 
-	public Set<String> getRaffleElements() {
+	public List<String> getRaffleElements() {
 		return raffleElements;
 	}
 
-	public void setRaffleElements(Set<String> raffleElements) {
+	public void setRaffleElements(List<String> raffleElements) {
 		this.raffleElements = raffleElements;
 		setLastModifiedInstant(Instant.now());
 	}
