@@ -13,6 +13,7 @@ import javax.validation.constraints.Size;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonProperty.Access;
 import com.serpest.tidraw.validation.DrawConstraint;
+import com.serpest.tidraw.validation.RaffleElementsConstraint;
 
 @DrawConstraint(message="The number of selected elements must be less then or equal to the number of the raffle elements")
 public class Draw {
@@ -37,6 +38,7 @@ public class Draw {
 	private int selectedElementsSize;
 
 	// raffleElements is a list and not a set for performance reasons in DrawExecutor
+	@RaffleElementsConstraint(message="The raffle elements list cannot contain duplicates")
 	@NotEmpty(message="The raffle elements list cannot be null")
 	private List<String> raffleElements;
 
