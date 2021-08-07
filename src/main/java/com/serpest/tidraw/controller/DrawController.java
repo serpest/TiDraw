@@ -13,6 +13,7 @@ import javax.validation.constraints.Future;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.IanaLinkRelations;
+import org.springframework.hateoas.LinkRelation;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -68,13 +69,23 @@ public class DrawController {
 		return DRAW_MODEL_ASSEMBLER.toModel(draw);
 	}
 
+	@GetMapping("/draws/{id}/editable")
+	public EntityModel<Boolean> isDrawEditable(@PathVariable String id) {
+		Draw draw = DRAW_REPOSITORY.findById(id).orElseThrow(() -> new DrawNotFoundException(id));
+		EntityModel<Boolean> editableBoolModel = EntityModel.of(isThereEnoughTimeToEditDrawBeforeDrawExecution(draw),
+				DRAW_MODEL_ASSEMBLER.toModel(draw).getLinks().without(IanaLinkRelations.SELF).without(LinkRelation.of("is-draw-editable")));
+		editableBoolModel.add(linkTo(methodOn(DrawController.class).isDrawEditable(id)).withSelfRel());
+		editableBoolModel.add(linkTo(methodOn(DrawController.class).getDraw(id)).withRel("draw"));
+		return editableBoolModel;
+	}
+
 	@GetMapping("/draws/{id}/selected-elements")
 	public CollectionModel<String> getDrawSelectedElements(@PathVariable String id) {
 		Draw draw = getDraw(id).getContent();
 		if (!draw.hasBeenExecuted())
 			throw new DrawNotYetExecutedException(id);
 		CollectionModel<String> selectedElementsModel = CollectionModel.of(draw.getSelectedElements(),
-				DRAW_MODEL_ASSEMBLER.toModel(draw).getLinks().without(IanaLinkRelations.SELF));
+				DRAW_MODEL_ASSEMBLER.toModel(draw).getLinks().without(IanaLinkRelations.SELF).without(LinkRelation.of("draw-selected-elements")));
 		selectedElementsModel.add(linkTo(methodOn(DrawController.class).getDrawSelectedElements(id)).withSelfRel());
 		selectedElementsModel.add(linkTo(methodOn(DrawController.class).getDraw(id)).withRel("draw"));
 		return selectedElementsModel;

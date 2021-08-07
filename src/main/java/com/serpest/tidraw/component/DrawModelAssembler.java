@@ -17,6 +17,7 @@ public class DrawModelAssembler implements RepresentationModelAssembler<Draw, En
 	public EntityModel<Draw> toModel(Draw draw) {
 		EntityModel<Draw> drawModel = EntityModel.of(draw);
 		drawModel.add(linkTo(methodOn(DrawController.class).getDraw(draw.getId())).withSelfRel());
+		drawModel.add(linkTo(methodOn(DrawController.class).isDrawEditable(draw.getId())).withRel("is-draw-editable"));
 		if (draw.hasBeenExecuted())
 			drawModel.add(linkTo(methodOn(DrawController.class).getDrawSelectedElements(draw.getId())).withRel("draw-selected-elements"));
 		drawModel.add(linkTo(methodOn(DrawController.class).editDrawDrawInstant(draw.getId(), null)).withRel("edit-draw-instant"));
