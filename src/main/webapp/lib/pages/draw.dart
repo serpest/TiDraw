@@ -3,9 +3,11 @@ import 'package:intl/intl.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:tidraw/api.dart' as api;
 import 'package:tidraw/model/draw.dart';
+import 'package:tidraw/pages/edit_draw.dart';
+import 'package:tidraw/utils/string_format_extension.dart';
 
 class DrawPage extends StatefulWidget {
-  static const route = '/draw';
+  static const route = '/draws/%s';
 
   final String id;
 
@@ -161,6 +163,31 @@ class _DrawPageState extends State<DrawPage> {
             return CircularProgressIndicator();
           },
         ),
+      ),
+      floatingActionButton: FutureBuilder<Draw>(
+        future: futureDraw,
+        builder: (context, snapshot) {
+          if (true) { // TODO: snapshot.hasData && document.cookie != null && document.cookie!.contains(snapshot.data!.id! + '=')
+            return FloatingActionButton(
+              child: Icon(Icons.edit),
+              tooltip: 'Edit draw',
+              onPressed: () {
+                Navigator.pushNamed(
+                  context,
+                  EditDrawPage.route.format([snapshot.data!.id!]),
+                  arguments: snapshot.data!,
+                ).then((result) {
+                  assert (result == null || result is bool);
+                  if (result != null && result as bool) {
+                    futureDraw = getDraw(widget.id);
+                    setState(() {});
+                  }
+                });
+              },
+            );
+          }
+          return Container(); // FutureBuilder's builder can't return null, so it returns an empty container
+        },
       ),
     );
   }

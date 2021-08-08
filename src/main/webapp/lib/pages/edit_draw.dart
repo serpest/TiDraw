@@ -3,16 +3,19 @@ import 'package:intl/intl.dart';
 import 'package:tidraw/api.dart' as api;
 import 'package:tidraw/model/draw.dart';
 import 'package:tidraw/pages/draw.dart';
-import 'package:tidraw/utils/string_format_extension.dart';
 
-class CreateDrawPage extends StatefulWidget {
-  static const route = '/create-draw';
+class EditDrawPage extends StatefulWidget {
+  static const route = DrawPage.route + '/edit';
+
+  final Draw originalDraw;
+
+  const EditDrawPage({Key? key, required this.originalDraw}) : super(key: key);
 
   @override
-  _CreateDrawPageState createState() => _CreateDrawPageState();
+  _EditDrawPageState createState() => _EditDrawPageState();
 }
 
-class _CreateDrawPageState extends State<CreateDrawPage> {
+class _EditDrawPageState extends State<EditDrawPage> {
   final _formKey = GlobalKey<FormState>();
 
   List<String> raffleElements = [];
@@ -22,6 +25,18 @@ class _CreateDrawPageState extends State<CreateDrawPage> {
   final drawTimeController = TextEditingController();
   final selectedElementsSizeController = TextEditingController();
   final addRaffleElementController = TextEditingController();
+
+  @override
+  void initState() {
+    super.initState();
+    nameController.text = widget.originalDraw.name;
+    if (widget.originalDraw.drawInstant != null) {
+      drawDateController.text = DateFormat('yyyy-MM-dd').format(widget.originalDraw.drawInstant!);
+      drawTimeController.text = DateFormat('HH:mm').format(widget.originalDraw.drawInstant!);
+    }
+    selectedElementsSizeController.text = widget.originalDraw.selectedElementsSize.toString();
+    raffleElements = widget.originalDraw.raffleElements;
+  }
 
   @override
   void dispose() {
@@ -37,7 +52,7 @@ class _CreateDrawPageState extends State<CreateDrawPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Create draw'),
+        title: Text('Edit draw'),
         centerTitle: true,
       ),
       body: Column(
@@ -207,24 +222,22 @@ class _CreateDrawPageState extends State<CreateDrawPage> {
       ),
       bottomNavigationBar: ElevatedButton.icon(
         icon: Icon(Icons.save),
-        label: Text('Submit'),
+        label: Text('Update'),
         onPressed: () async {
           if (_formKey.currentState != null && _formKey.currentState!.validate()) {
             Draw formDraw = Draw(
+              id: widget.originalDraw.id,
               name: nameController.text,
               drawInstant: (drawDateController.text.isNotEmpty && drawTimeController.text.isNotEmpty) ? DateTime.parse(drawDateController.text + ' ' + drawTimeController.text) : null,
               selectedElementsSize: int.parse(selectedElementsSizeController.text),
               raffleElements: raffleElements,
             );
             try {
-              Draw createdDraw = await api.createDraw(formDraw);
-              Navigator.pushNamed(
-                context,
-                DrawPage.route.format([createdDraw.id]),
-              );
+              await api.updateDraw(formDraw);
+              Navigator.pop(context, true);
             } on Exception {
               // TODO
-              ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Failed to create draw')));
+              ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Failed to update draw')));
             }
           }
         },

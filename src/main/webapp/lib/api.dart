@@ -26,7 +26,7 @@ Future<Draw> getDraw(String id) async {
   }
 }
 
-Future<Draw> putDraw(Draw draw) async {
+Future<Draw> createDraw(Draw draw) async {
   try {
     final response = await http.post(
       Uri.parse(API_URL + '/api/draws'),
@@ -40,6 +40,29 @@ Future<Draw> putDraw(Draw draw) async {
     } else {
       // TODO
       throw ApiException('Failed to create draw');
+    }
+  } on TimeoutException {
+    throw ApiException('Connection timed out');
+  } on SocketException {
+    throw ApiException('Connection failed');
+  }
+}
+
+Future<Draw> updateDraw(Draw draw) async {
+  try {
+    assert (draw.id != null);
+    final response = await http.put(
+      Uri.parse(API_URL + '/api/draws/' + draw.id!.toString()),
+      headers: {
+        'Content-Type': 'application/json; charset=UTF-8',
+      },
+      body: jsonEncode(draw),
+    );
+    if (response.statusCode == 201) {
+      return Draw.fromJson(jsonDecode(response.body));
+    } else {
+      // TODO
+      throw ApiException('Failed to update draw');
     }
   } on TimeoutException {
     throw ApiException('Connection timed out');

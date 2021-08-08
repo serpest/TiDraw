@@ -143,6 +143,8 @@ public class DrawController {
 
 	private boolean isThereEnoughTimeToEditDrawBeforeDrawExecution(Draw draw) {
 		// Are there more then 2 minutes to the draw execution?
+		if (draw.getDrawInstant() == null)
+			return false;
 		return Duration.between(Instant.now(), draw.getDrawInstant()).compareTo(Duration.ofMinutes(2)) > 0;
 	}
 

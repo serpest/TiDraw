@@ -1,8 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:tidraw/pages/create_draw.dart';
 import 'package:tidraw/pages/draw.dart';
+import 'package:tidraw/pages/edit_draw.dart';
 import 'package:tidraw/pages/home.dart';
 import 'package:tidraw/pages/search_draw.dart';
+import 'package:tidraw/utils/string_format_extension.dart';
+
+import 'model/draw.dart';
 
 void main() {
   runApp(App());
@@ -24,8 +28,8 @@ class App extends StatelessWidget {
       },
       onGenerateRoute: (settings) {
         // DrawPage.route generation
-        final regex = RegExp(r'\' + DrawPage.route + r'\/[a-zA-Z0-9]+$');
-        if (settings.name != null && regex.hasMatch(settings.name!)) {
+        final drawPageRegex = RegExp(DrawPage.route.replaceAll('/', '\/').format([r'[a-zA-Z0-9]{24}']) + r'$'); // It matches only 24 characters IDs
+        if (settings.name != null && drawPageRegex.hasMatch(settings.name!)) {
           String id = settings.name!.substring(settings.name!.lastIndexOf('/') + 1);
           return MaterialPageRoute(
             builder: (context) {
@@ -33,6 +37,20 @@ class App extends StatelessWidget {
             },
             settings: settings,
           );
+        }
+        final editDrawPageRegex = RegExp(EditDrawPage.route.replaceAll('/', '\/').format([r'[a-zA-Z0-9]{24}']) + r'$'); // It matches only 24 characters IDs
+        if (settings.name != null && editDrawPageRegex.hasMatch(settings.name!)) {
+          if (settings.arguments == null) {
+            return null; // TODO
+          } else {
+            assert (settings.arguments is Draw);
+            return MaterialPageRoute(
+              builder: (context) {
+                return EditDrawPage(originalDraw: settings.arguments! as Draw);
+              },
+              settings: settings,
+            );
+          }
         }
       },
     );
