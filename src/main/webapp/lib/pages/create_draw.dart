@@ -23,6 +23,9 @@ class _CreateDrawPageState extends State<CreateDrawPage> {
   final selectedElementsSizeController = TextEditingController();
   final addRaffleElementController = TextEditingController();
 
+  final dateRegex = RegExp(r'^\d{4}\-(0[1-9]|1[012])\-(0[1-9]|[12][0-9]|3[01])$');
+  final timeRegex = RegExp(r'^([01][0-9]|2[0-3]):([0-5][0-9])$');
+
   @override
   void dispose() {
     nameController.dispose();
@@ -72,7 +75,7 @@ class _CreateDrawPageState extends State<CreateDrawPage> {
                       // TODO
                       if (value == null || value.isEmpty) {
                         return null;
-                      } else if (value.length != 10) {
+                      } else if (!dateRegex.hasMatch(value)) {
                         return 'The date must be formatted like 2021-08-30';
                       }
                       return null;
@@ -99,7 +102,7 @@ class _CreateDrawPageState extends State<CreateDrawPage> {
                       // TODO
                       if (value == null || value.isEmpty) {
                         return null;
-                      } else if (value.length != 5) {
+                      } else if (!timeRegex.hasMatch(value)) {
                         return 'The time must be formatted like 02:46';
                       }
                       return null;
@@ -192,7 +195,7 @@ class _CreateDrawPageState extends State<CreateDrawPage> {
                       newElementName = addRaffleElementController.text;
                       addRaffleElementController.clear();
                     },
-                    child: Text('Ok')
+                    child: Text('Add')
                   ),
                 ],
               );
@@ -207,7 +210,7 @@ class _CreateDrawPageState extends State<CreateDrawPage> {
       ),
       bottomNavigationBar: ElevatedButton.icon(
         icon: Icon(Icons.save),
-        label: Text('Submit'),
+        label: Text('Create'),
         onPressed: () async {
           if (_formKey.currentState != null && _formKey.currentState!.validate()) {
             Draw formDraw = Draw(

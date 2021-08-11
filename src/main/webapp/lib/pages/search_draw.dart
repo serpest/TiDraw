@@ -15,6 +15,12 @@ class _SearchDrawPageState extends State<SearchDrawPage> {
   final idController = TextEditingController();
 
   @override
+  void dispose() {
+    idController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
@@ -32,6 +38,9 @@ class _SearchDrawPageState extends State<SearchDrawPage> {
             validator: (value) {
               if (value == null || value.isEmpty) {
                 return 'The draw ID must not be empty';
+              }
+              if (value.length != 24) {
+                return 'The draw ID must be 24 characters long';
               }
               return null;
             },

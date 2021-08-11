@@ -18,12 +18,14 @@ class DrawPage extends StatefulWidget {
 }
 
 class _DrawPageState extends State<DrawPage> {
-  late Future<Draw> futureDraw;
+  late Future<Draw> drawFuture;
+  late Future<bool> editableFlagFuture;
 
   @override
   void initState() {
     super.initState();
-    futureDraw = getDraw(widget.id);
+    drawFuture = getDraw();
+    editableFlagFuture = getEditableFlagFuture();
   }
 
   @override
@@ -47,7 +49,7 @@ class _DrawPageState extends State<DrawPage> {
       ),
       body: Center(
         child: FutureBuilder<Draw>(
-          future: futureDraw,
+          future: drawFuture,
           builder: (context, snapshot) {
             if (snapshot.hasData) {
               String creationInstantStr = (snapshot.data!.creationInstant != null) ?
@@ -164,23 +166,22 @@ class _DrawPageState extends State<DrawPage> {
           },
         ),
       ),
-      floatingActionButton: FutureBuilder<Draw>(
-        future: futureDraw,
+      floatingActionButton: FutureBuilder<bool>(
+        future: editableFlagFuture,
         builder: (context, snapshot) {
-          if (true) { // TODO: snapshot.hasData && document.cookie != null && document.cookie!.contains(snapshot.data!.id! + '=')
+          if (snapshot.hasData && snapshot.data!) { // TODO: && document.cookie != null && document.cookie!.contains(widget.id + '=')
             return FloatingActionButton(
               child: Icon(Icons.edit),
               tooltip: 'Edit draw',
               onPressed: () {
                 Navigator.pushNamed(
                   context,
-                  EditDrawPage.route.format([snapshot.data!.id!]),
-                  arguments: snapshot.data!,
-                ).then((result) {
-                  assert (result == null || result is bool);
-                  if (result != null && result as bool) {
-                    futureDraw = getDraw(widget.id);
-                    setState(() {});
+                  EditDrawPage.route.format([widget.id]),
+                ).then((value) {
+                  assert (value == null || value is bool);
+                  if (value != null && value as bool) {
+                    // Reload DrawPage
+                    Navigator.popAndPushNamed(context, DrawPage.route.format([widget.id]));
                   }
                 });
               },
@@ -192,14 +193,21 @@ class _DrawPageState extends State<DrawPage> {
     );
   }
 
-  Future<Draw> getDraw(String id) async {
+  Future<Draw> getDraw() async {
     Draw draw = await api.getDraw(widget.id);
     if (draw.selectedElements == null) {
-      Future.delayed(draw.drawInstant!.difference(DateTime.now()), () => setState(() {
-                      futureDraw = api.getDraw(widget.id);
-                    }));
+      Future.delayed(draw.drawInstant!.difference(DateTime.now()), () => drawFuture = getDraw());
     }
     return draw;
+  }
+
+  Future<bool> getEditableFlagFuture() async {
+    DateTime noEditableInstant = await api.getNoEditableInstant(widget.id);
+    bool editableFlag = noEditableInstant.isAfter(DateTime.now());
+    if (editableFlag) {
+      Future.delayed(noEditableInstant.difference(DateTime.now()), () => editableFlagFuture = getEditableFlagFuture());
+    }
+    return editableFlag;
   }
 
   String getDurationStrAndScheduleNextViewRefresh(Duration duration) {

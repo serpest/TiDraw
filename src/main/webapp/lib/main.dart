@@ -13,6 +13,9 @@ void main() {
 }
 
 class App extends StatelessWidget {
+  final drawPageRegex = RegExp(DrawPage.route.replaceAll('/', '\/').format([r'[a-zA-Z0-9]{24}']) + r'$'); // It matches only 24 characters IDs
+  final editDrawPageRegex = RegExp(EditDrawPage.route.replaceAll('/', '\/').format([r'[a-zA-Z0-9]{24}']) + r'$'); // It matches only 24 characters IDs
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -20,15 +23,13 @@ class App extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      initialRoute: HomePage.route,
+      home: HomePage(),
       routes: {
-        HomePage.route: (context) => HomePage(),
         CreateDrawPage.route: (context) => CreateDrawPage(),
         SearchDrawPage.route: (context) => SearchDrawPage(),
       },
       onGenerateRoute: (settings) {
         // DrawPage.route generation
-        final drawPageRegex = RegExp(DrawPage.route.replaceAll('/', '\/').format([r'[a-zA-Z0-9]{24}']) + r'$'); // It matches only 24 characters IDs
         if (settings.name != null && drawPageRegex.hasMatch(settings.name!)) {
           String id = settings.name!.substring(settings.name!.lastIndexOf('/') + 1);
           return MaterialPageRoute(
@@ -38,19 +39,15 @@ class App extends StatelessWidget {
             settings: settings,
           );
         }
-        final editDrawPageRegex = RegExp(EditDrawPage.route.replaceAll('/', '\/').format([r'[a-zA-Z0-9]{24}']) + r'$'); // It matches only 24 characters IDs
+        // EditDrawPage.route generation
         if (settings.name != null && editDrawPageRegex.hasMatch(settings.name!)) {
-          if (settings.arguments == null) {
-            return null; // TODO
-          } else {
-            assert (settings.arguments is Draw);
-            return MaterialPageRoute(
-              builder: (context) {
-                return EditDrawPage(originalDraw: settings.arguments! as Draw);
-              },
-              settings: settings,
-            );
-          }
+          String id = settings.name!.substring(settings.name!.lastIndexOf('/', settings.name!.length - 6), settings.name!.length - 5);
+          return MaterialPageRoute(
+            builder: (context) {
+              return EditDrawPage(id: id);
+            },
+            settings: settings,
+          );
         }
       },
     );

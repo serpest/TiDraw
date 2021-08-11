@@ -5,7 +5,7 @@ import 'dart:io';
 import 'package:http/http.dart' as http;
 import 'package:tidraw/model/draw.dart';
 
-// API_URL has to be specified when debugging or building the application using the argument "--dart-define=API_URL=<http://example.com>"
+// API_URL has to be specified when debugging or building the application using the argument "--dart-define=API_URL=<http://example.com>" if the backend runs on a different host
 const String API_URL = String.fromEnvironment('API_URL');
 
 Future<Draw> getDraw(String id) async {
@@ -18,6 +18,44 @@ Future<Draw> getDraw(String id) async {
     } else {
       // TODO
       throw Exception('Failed to load draw');
+    }
+  } on TimeoutException {
+    throw ApiException('Connection timed out');
+  } on SocketException {
+    throw ApiException('Connection failed');
+  }
+}
+
+Future<DateTime> getNoEditableInstant(String id) async {
+  try {
+    final response = await http.get(Uri.parse(API_URL + '/api/draws/' + id + '/no-editable-instant'));
+    if (response.statusCode == 200) {
+      return DateTime.parse(jsonDecode(response.body)['instant']);
+    } else if (response.statusCode == 404) {
+      throw ApiException('Draw not found');
+    } else {
+      // TODO
+      throw Exception('Failed to check editability');
+    }
+  } on TimeoutException {
+    throw ApiException('Connection timed out');
+  } on SocketException {
+    throw ApiException('Connection failed');
+  }
+}
+
+Future<bool> deleteDraw(String id) async {
+  try {
+    final response = await http.delete(Uri.parse(API_URL + '/api/draws/' + id));
+    if (response.statusCode == 204) {
+      return true;
+    } else if (response.statusCode == 404) {
+      throw ApiException('Draw not found');
+    } else if (response.statusCode == 410) {
+      throw ApiException('Draw no longer deletable');
+    } else {
+      // TODO
+      throw Exception('Failed to check editability');
     }
   } on TimeoutException {
     throw ApiException('Connection timed out');
@@ -48,7 +86,7 @@ Future<Draw> createDraw(Draw draw) async {
   }
 }
 
-Future<Draw> updateDraw(Draw draw) async {
+Future<Draw> replaceDraw(Draw draw) async {
   try {
     assert (draw.id != null);
     final response = await http.put(
@@ -60,6 +98,8 @@ Future<Draw> updateDraw(Draw draw) async {
     );
     if (response.statusCode == 201) {
       return Draw.fromJson(jsonDecode(response.body));
+    } else if (response.statusCode == 410) {
+      throw ApiException('Draw no longer editable');
     } else {
       // TODO
       throw ApiException('Failed to update draw');
