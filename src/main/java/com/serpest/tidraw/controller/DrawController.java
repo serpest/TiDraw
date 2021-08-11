@@ -5,7 +5,6 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
 import java.time.Duration;
 import java.time.Instant;
-import java.util.Optional;
 
 import javax.validation.Valid;
 import javax.validation.constraints.Future;
@@ -39,15 +38,49 @@ import com.serpest.tidraw.repository.DrawRepository;
 @RequestMapping("/api")
 public class DrawController {
 
+	private static final Duration DRAW_NO_EDITABLE_DURATION_BEFORE_EXECUTION = Duration.ofMinutes(5);
+
 	// This class is used to simplify the method editDrawDrawInstant()
 	private static class DrawDrawInstantPatch {
+
+		@Future(message="The draw instant must be in the future")
+		private Instant drawInstant;
 
 		private DrawDrawInstantPatch(String text) {
 			drawInstant = Instant.parse(text);
 		}
 
-		@Future(message="The draw instant must be in the future")
-		private Instant drawInstant;
+	}
+
+	// Used in EntityModel
+	private static class BooleanWrapper {
+
+		private boolean bool;
+
+		private BooleanWrapper(boolean bool) {
+			this.bool = bool;
+		}
+
+		@SuppressWarnings("unused")
+		public boolean isBool() {
+			return bool;
+		}
+
+	}
+
+	// Used in EntityModel
+	private static class InstantWrapper {
+
+		private Instant instant;
+
+		private InstantWrapper(Instant instant) {
+			this.instant = instant;
+		}
+
+		@SuppressWarnings("unused")
+		public Instant getInstant() {
+			return instant;
+		}
 
 	}
 
@@ -70,13 +103,25 @@ public class DrawController {
 	}
 
 	@GetMapping("/draws/{id}/editable")
-	public EntityModel<Boolean> isDrawEditable(@PathVariable String id) {
+	public EntityModel<BooleanWrapper> isDrawEditable(@PathVariable String id) {
 		Draw draw = DRAW_REPOSITORY.findById(id).orElseThrow(() -> new DrawNotFoundException(id));
-		EntityModel<Boolean> editableBoolModel = EntityModel.of(isThereEnoughTimeToEditDrawBeforeDrawExecution(draw),
+		boolean editableBool = isThereEnoughTimeToEditDrawBeforeDrawExecution(draw);
+		EntityModel<BooleanWrapper> editableBoolModel = EntityModel.of(new BooleanWrapper(editableBool),
 				DRAW_MODEL_ASSEMBLER.toModel(draw).getLinks().without(IanaLinkRelations.SELF).without(LinkRelation.of("is-draw-editable")));
 		editableBoolModel.add(linkTo(methodOn(DrawController.class).isDrawEditable(id)).withSelfRel());
 		editableBoolModel.add(linkTo(methodOn(DrawController.class).getDraw(id)).withRel("draw"));
 		return editableBoolModel;
+	}
+
+	@GetMapping("/draws/{id}/no-editable-instant")
+	public EntityModel<InstantWrapper> getNoEditableInstant(@PathVariable String id) {
+		Draw draw = DRAW_REPOSITORY.findById(id).orElseThrow(() -> new DrawNotFoundException(id));
+		Instant noEditableInstant = getNoEditableInstantHelper(draw);
+		EntityModel<InstantWrapper> noEditableInstantModel = EntityModel.of(new InstantWrapper(noEditableInstant),
+				DRAW_MODEL_ASSEMBLER.toModel(draw).getLinks().without(IanaLinkRelations.SELF).without(LinkRelation.of("draw-no-editable-instant")));
+		noEditableInstantModel.add(linkTo(methodOn(DrawController.class).getNoEditableInstant(id)).withSelfRel());
+		noEditableInstantModel.add(linkTo(methodOn(DrawController.class).getDraw(id)).withRel("draw"));
+		return noEditableInstantModel;
 	}
 
 	@GetMapping("/draws/{id}/selected-elements")
@@ -93,10 +138,9 @@ public class DrawController {
 
 	@DeleteMapping("/draws/{id}")
 	public ResponseEntity<Object> deleteDraw(@PathVariable String id) {
-		Optional<Draw> optionalDraw = DRAW_REPOSITORY.findById(id);
-		if (optionalDraw.isPresent() &&
-			!isThereEnoughTimeToEditDrawBeforeDrawExecution(optionalDraw.get())) { // The draw has been already executed or the execution instant is near
-				throw new EditingTimeLimitExceededException(id);
+		Draw draw = DRAW_REPOSITORY.findById(id).orElseThrow(() -> new DrawNotFoundException(id));
+		if (!isThereEnoughTimeToEditDrawBeforeDrawExecution(draw)) { // The draw has been already executed or the execution instant is near
+			throw new EditingTimeLimitExceededException(id);
 		}
 		DRAW_REPOSITORY.deleteById(id);
 		return ResponseEntity.noContent().build();
@@ -142,10 +186,15 @@ public class DrawController {
 	}
 
 	private boolean isThereEnoughTimeToEditDrawBeforeDrawExecution(Draw draw) {
-		// Are there more then 2 minutes to the draw execution?
 		if (draw.getDrawInstant() == null)
 			return false;
-		return Duration.between(Instant.now(), draw.getDrawInstant()).compareTo(Duration.ofMinutes(2)) > 0;
+		return Duration.between(Instant.now(), draw.getDrawInstant()).compareTo(DRAW_NO_EDITABLE_DURATION_BEFORE_EXECUTION) > 0;
+	}
+
+	private Instant getNoEditableInstantHelper(Draw draw) {
+		if (draw.getDrawInstant() == null)
+			return draw.getCreationInstant();
+		return draw.getDrawInstant().minus(DRAW_NO_EDITABLE_DURATION_BEFORE_EXECUTION);
 	}
 
 }

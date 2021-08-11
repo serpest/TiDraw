@@ -20,7 +20,6 @@ public class DrawExecutor {
 	 * when n=30 and k=5 and the methods are executed 10,000 times, but
 	 * they have similar performance when n=30 and k=3 and, generally,
 	 * the implemented method performs slower then the other one when n-k is big.
-	 * 
 	 */
 	public void executeDraw(Draw draw) {
 		List<String> shuffledList = new ArrayList<>(draw.getRaffleElements());
