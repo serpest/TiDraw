@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:tidraw/pages/draw.dart';
+import 'package:tidraw/utils/constants.dart' as constants;
 import 'package:tidraw/utils/string_format_extension.dart';
 
 class SearchDrawPage extends StatefulWidget {
@@ -39,8 +40,8 @@ class _SearchDrawPageState extends State<SearchDrawPage> {
               if (value == null || value.isEmpty) {
                 return 'The draw ID must not be empty';
               }
-              if (value.length != 24) {
-                return 'The draw ID must be 24 characters long';
+              if (value.length != constants.DRAW_ID_LENGTH) {
+                return 'The draw ID must be ' + constants.DRAW_ID_LENGTH.toString() +  ' characters long';
               }
               return null;
             },

@@ -4,17 +4,16 @@ import 'package:tidraw/pages/draw.dart';
 import 'package:tidraw/pages/edit_draw.dart';
 import 'package:tidraw/pages/home.dart';
 import 'package:tidraw/pages/search_draw.dart';
+import 'package:tidraw/utils/constants.dart' as constants;
 import 'package:tidraw/utils/string_format_extension.dart';
-
-import 'model/draw.dart';
 
 void main() {
   runApp(App());
 }
 
 class App extends StatelessWidget {
-  final drawPageRegex = RegExp(DrawPage.route.replaceAll('/', '\/').format([r'[a-zA-Z0-9]{24}']) + r'$'); // It matches only 24 characters IDs
-  final editDrawPageRegex = RegExp(EditDrawPage.route.replaceAll('/', '\/').format([r'[a-zA-Z0-9]{24}']) + r'$'); // It matches only 24 characters IDs
+  final drawPageRegex = RegExp(DrawPage.route.replaceAll('/', '\/').format([r'[a-zA-Z0-9]{' + constants.DRAW_ID_LENGTH.toString() + r'}']) + r'$');
+  final editDrawPageRegex = RegExp(EditDrawPage.route.replaceAll('/', '\/').format([r'[a-zA-Z0-9]{' + constants.DRAW_ID_LENGTH.toString() + r'}']) + r'$');
 
   @override
   Widget build(BuildContext context) {

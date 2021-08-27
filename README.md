@@ -14,6 +14,7 @@ Another feature that enhances the security is having an option that makes the dr
     ``` properties
     FLUTTER_DEPLOY_DIR=src/main/resources/static
     FLUTTER_SOURCE_DIR=src/main/webapp
+    FLUTTER_BUILD=flutter build web --release --dart-define=DRAW_ID_LENGTH=24
     ```
 4. [Create a MongoDB database and connect it to the application](https://www.mongodb.com/developer/how-to/use-atlas-on-heroku) using "spring.data.mongodb.uri" and not "MONGODB_URI" as Config Var key on Heroku;
 5. Push application on Heroku running the following command:

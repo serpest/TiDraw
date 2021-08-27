@@ -4,13 +4,11 @@ import 'dart:io';
 
 import 'package:http/http.dart' as http;
 import 'package:tidraw/model/draw.dart';
-
-// API_URL has to be specified when debugging or building the application using the argument "--dart-define=API_URL=<http://example.com>" if the backend runs on a different host
-const String API_URL = String.fromEnvironment('API_URL');
+import 'package:tidraw/utils/constants.dart' as constants;
 
 Future<Draw> getDraw(String id) async {
   try {
-    final response = await http.get(Uri.parse(API_URL + '/api/draws/' + id));
+    final response = await http.get(Uri.parse(constants.API_URL + '/api/draws/' + id));
     if (response.statusCode == 200) {
       return Draw.fromJson(jsonDecode(response.body));
     } else if (response.statusCode == 404) {
@@ -28,7 +26,7 @@ Future<Draw> getDraw(String id) async {
 
 Future<DateTime> getNoEditableInstant(String id) async {
   try {
-    final response = await http.get(Uri.parse(API_URL + '/api/draws/' + id + '/no-editable-instant'));
+    final response = await http.get(Uri.parse(constants.API_URL + '/api/draws/' + id + '/no-editable-instant'));
     if (response.statusCode == 200) {
       return DateTime.parse(jsonDecode(response.body)['instant']);
     } else if (response.statusCode == 404) {
@@ -46,7 +44,7 @@ Future<DateTime> getNoEditableInstant(String id) async {
 
 Future<bool> deleteDraw(String id) async {
   try {
-    final response = await http.delete(Uri.parse(API_URL + '/api/draws/' + id));
+    final response = await http.delete(Uri.parse(constants.API_URL + '/api/draws/' + id));
     if (response.statusCode == 204) {
       return true;
     } else if (response.statusCode == 404) {
@@ -67,7 +65,7 @@ Future<bool> deleteDraw(String id) async {
 Future<Draw> createDraw(Draw draw) async {
   try {
     final response = await http.post(
-      Uri.parse(API_URL + '/api/draws'),
+      Uri.parse(constants.API_URL + '/api/draws'),
       headers: {
         'Content-Type': 'application/json; charset=UTF-8',
       },
@@ -90,7 +88,7 @@ Future<Draw> replaceDraw(Draw draw) async {
   try {
     assert (draw.id != null);
     final response = await http.put(
-      Uri.parse(API_URL + '/api/draws/' + draw.id!.toString()),
+      Uri.parse(constants.API_URL + '/api/draws/' + draw.id!.toString()),
       headers: {
         'Content-Type': 'application/json; charset=UTF-8',
       },
