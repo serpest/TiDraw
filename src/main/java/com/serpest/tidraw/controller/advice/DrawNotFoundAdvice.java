@@ -10,7 +10,7 @@ import com.serpest.tidraw.controller.exception.DrawNotFoundException;
 
 @ControllerAdvice
 public class DrawNotFoundAdvice {
-	
+
 	@ResponseBody
 	@ExceptionHandler(DrawNotFoundException.class)
 	@ResponseStatus(code = HttpStatus.NOT_FOUND)
