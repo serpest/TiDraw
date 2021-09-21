@@ -237,7 +237,7 @@ class _EditDrawPageState extends State<EditDrawPage> {
                     );
                   },
                 );
-                if (newElementName != null) {
+                if (newElementName != null && !raffleElements.contains(newElementName)) { // A set would be more efficient, but input order wouldn't be preserved
                   setState(() {
                     raffleElements = [...raffleElements, newElementName!];
                   });

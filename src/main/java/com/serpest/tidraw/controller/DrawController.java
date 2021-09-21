@@ -6,6 +6,8 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 import java.time.Duration;
 import java.time.Instant;
 
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 import javax.validation.constraints.Future;
 
@@ -32,6 +34,7 @@ import com.serpest.tidraw.controller.exception.EditingTimeLimitExceededException
 import com.serpest.tidraw.model.Draw;
 import com.serpest.tidraw.model.DrawExecutor;
 import com.serpest.tidraw.repository.DrawRepository;
+import com.serpest.tidraw.security.DrawTokenManager;
 
 @RestController
 @CrossOrigin
@@ -88,11 +91,14 @@ public class DrawController {
 
 	private final DrawModelAssembler DRAW_MODEL_ASSEMBLER;
 
+	private final DrawTokenManager DRAW_TOKEN_MANAGER;
+
 	private final DrawExecutor DRAW_EXECUTOR;
 
-	public DrawController(final DrawRepository DRAW_REPOSITORY, final DrawModelAssembler DRAW_MODEL_ASSEMBLER) {
+	public DrawController(final DrawRepository DRAW_REPOSITORY, final DrawModelAssembler DRAW_MODEL_ASSEMBLER, final DrawTokenManager DRAW_TOKEN_MANAGER) {
 		this.DRAW_REPOSITORY = DRAW_REPOSITORY;
 		this.DRAW_MODEL_ASSEMBLER = DRAW_MODEL_ASSEMBLER;
+		this.DRAW_TOKEN_MANAGER = DRAW_TOKEN_MANAGER;
 		DRAW_EXECUTOR = new DrawExecutor();
 	}
 
@@ -116,7 +122,7 @@ public class DrawController {
 	@GetMapping("/draws/{id}/no-editable-instant")
 	public EntityModel<InstantWrapper> getNoEditableInstant(@PathVariable String id) {
 		Draw draw = DRAW_REPOSITORY.findById(id).orElseThrow(() -> new DrawNotFoundException(id));
-		Instant noEditableInstant = getNoEditableInstantHelper(draw);
+		Instant noEditableInstant = getNoEditableInstant(draw);
 		EntityModel<InstantWrapper> noEditableInstantModel = EntityModel.of(new InstantWrapper(noEditableInstant),
 				DRAW_MODEL_ASSEMBLER.toModel(draw).getLinks().without(IanaLinkRelations.SELF).without(LinkRelation.of("draw-no-editable-instant")));
 		noEditableInstantModel.add(linkTo(methodOn(DrawController.class).getNoEditableInstant(id)).withSelfRel());
@@ -147,16 +153,26 @@ public class DrawController {
 	}
 
 	@PostMapping("/draws")
-	public ResponseEntity<EntityModel<Draw>> createDraw(@RequestBody @Valid Draw draw) {
+	public ResponseEntity<EntityModel<Draw>> createDraw(@RequestBody @Valid Draw draw, HttpServletResponse response) {
 		DRAW_EXECUTOR.executeDraw(draw); // The draw is executed immediately after receiving the draw and not at the specified draw instant
-		EntityModel<Draw> drawModel = DRAW_MODEL_ASSEMBLER.toModel(DRAW_REPOSITORY.save(draw));
+		Draw savedDraw = DRAW_REPOSITORY.save(draw);
+
+		String token = DRAW_TOKEN_MANAGER.createToken(savedDraw.getId());
+		Cookie cookie = new Cookie("creator-token", token);
+		cookie.setPath("/api/draws/" + savedDraw.getId());
+		cookie.setMaxAge(Integer.MAX_VALUE); // An alternative to "Integer.MAX_VALUE" could be "(int) Duration.between(Instant.now(), getNoEditableInstant(savedDraw)).getSeconds()", but than the cookie should be edited if the draw is updated
+		cookie.setSecure(true);
+		cookie.setHttpOnly(true);
+		response.addCookie(cookie);
+
+		EntityModel<Draw> drawModel = DRAW_MODEL_ASSEMBLER.toModel(savedDraw);
 		return ResponseEntity
 				.created(drawModel.getRequiredLink(IanaLinkRelations.SELF).toUri())
 				.body(drawModel);
 	}
 
 	@PutMapping("/draws/{id}")
-	public ResponseEntity<EntityModel<Draw>> replaceDraw(@PathVariable String id, @RequestBody @Valid Draw newDraw) {
+	public ResponseEntity<EntityModel<Draw>> replaceDraw(@PathVariable String id, @RequestBody @Valid Draw newDraw, HttpServletResponse response) {
 		return DRAW_REPOSITORY.findById(id).map(originalDraw -> {
 					if (!isThereEnoughTimeToEditDrawBeforeDrawExecution(originalDraw))
 						throw new EditingTimeLimitExceededException(id);
@@ -171,7 +187,7 @@ public class DrawController {
 							.body(originalDrawModel);
 				})
 				.orElseGet(() -> {
-					return createDraw(newDraw);
+					return createDraw(newDraw, response);
 				});
 	}
 
@@ -191,7 +207,7 @@ public class DrawController {
 		return Duration.between(Instant.now(), draw.getDrawInstant()).compareTo(DRAW_NO_EDITABLE_DURATION_BEFORE_EXECUTION) > 0;
 	}
 
-	private Instant getNoEditableInstantHelper(Draw draw) {
+	private Instant getNoEditableInstant(Draw draw) {
 		if (draw.getDrawInstant() == null)
 			return draw.getCreationInstant();
 		return draw.getDrawInstant().minus(DRAW_NO_EDITABLE_DURATION_BEFORE_EXECUTION);

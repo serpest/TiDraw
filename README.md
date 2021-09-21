@@ -1,7 +1,7 @@
 ﻿# TiDraw
 TiDraw is a draw system based on client-server model designed to be as secure as possible. For this reason, the draw is executed by the server and the users can't cheat altering the draw.
 
-Another feature that enhances the security is having an option that makes the draw results appear from a selected date and time. In this way, the draw creator can share the draw link with other people before the draw instant to assure them that he/she hasn't generate more then one draw waiting for the preferred results.
+Another feature that enhances the security is having an option that makes the draw results appear from a selected date and time. In this way, the draw creator can share the draw link with other people before the draw instant to assure them that he/she hadn't generated more then one draw waiting for the preferred results.
 
 ## Deployment
 1. [Create an application on Heroku](https://devcenter.heroku.com/articles/creating-apps);
@@ -17,7 +17,7 @@ Another feature that enhances the security is having an option that makes the dr
     FLUTTER_BUILD=flutter build web --release --dart-define=DRAW_ID_LENGTH=24
     ```
 4. [Create a MongoDB database and connect it to the application](https://www.mongodb.com/developer/how-to/use-atlas-on-heroku) using "spring.data.mongodb.uri" and not "MONGODB_URI" as Config Var key on Heroku;
-5. Push application on Heroku running the following command:
+5. Push application to Heroku running the following command:
     ``` shell
     git push heroku master
     ```
