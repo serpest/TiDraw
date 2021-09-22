@@ -5,7 +5,7 @@ import java.util.UUID;
 
 import org.springframework.stereotype.Component;
 
-@Component
+@Component("drawTokenManager")
 public class DrawTokenManager {
 
 	private final DrawTokenRepository DRAW_TOKEN_REPOSITORY;

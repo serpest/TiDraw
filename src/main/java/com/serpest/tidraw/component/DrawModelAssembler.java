@@ -21,9 +21,9 @@ public class DrawModelAssembler implements RepresentationModelAssembler<Draw, En
 		drawModel.add(linkTo(methodOn(DrawController.class).getNoEditableInstant(draw.getId())).withRel("draw-no-editable-instant"));
 		if (draw.hasBeenExecuted())
 			drawModel.add(linkTo(methodOn(DrawController.class).getDrawSelectedElements(draw.getId())).withRel("draw-selected-elements"));
-		drawModel.add(linkTo(methodOn(DrawController.class).editDrawDrawInstant(draw.getId(), null)).withRel("edit-draw-instant"));
-		drawModel.add(linkTo(methodOn(DrawController.class).replaceDraw(draw.getId(), null, null)).withRel("replace-draw"));
-		drawModel.add(linkTo(methodOn(DrawController.class).deleteDraw(draw.getId())).withRel("delete-draw"));
+		drawModel.add(linkTo(methodOn(DrawController.class).editDrawDrawInstant(null, draw.getId(), null)).withRel("edit-draw-instant"));
+		drawModel.add(linkTo(methodOn(DrawController.class).replaceDraw(null, draw.getId(), null, null)).withRel("replace-draw"));
+		drawModel.add(linkTo(methodOn(DrawController.class).deleteDraw(null, draw.getId())).withRel("delete-draw"));
 		drawModel.add(linkTo(methodOn(DrawController.class).createDraw(null, null)).withRel("create-draw"));
 		return drawModel;
 	}

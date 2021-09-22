@@ -16,6 +16,7 @@ import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.IanaLinkRelations;
 import org.springframework.hateoas.LinkRelation;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -24,6 +25,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -143,7 +145,8 @@ public class DrawController {
 	}
 
 	@DeleteMapping("/draws/{id}")
-	public ResponseEntity<Object> deleteDraw(@PathVariable String id) {
+	@PreAuthorize("@drawTokenManager.checkToken(new com.serpest.tidraw.security.DrawToken(#id, #token))")
+	public ResponseEntity<Object> deleteDraw(@RequestHeader("token") String token, @PathVariable String id) {
 		Draw draw = DRAW_REPOSITORY.findById(id).orElseThrow(() -> new DrawNotFoundException(id));
 		if (!isThereEnoughTimeToEditDrawBeforeDrawExecution(draw)) { // The draw has been already executed or the execution instant is near
 			throw new EditingTimeLimitExceededException(id);
@@ -172,7 +175,8 @@ public class DrawController {
 	}
 
 	@PutMapping("/draws/{id}")
-	public ResponseEntity<EntityModel<Draw>> replaceDraw(@PathVariable String id, @RequestBody @Valid Draw newDraw, HttpServletResponse response) {
+	@PreAuthorize("@DrawTokenManager.checkToken(new com.serpest.tidraw.security.DrawToken(#id, #token))")
+	public ResponseEntity<EntityModel<Draw>> replaceDraw(@RequestHeader("token") String token, @PathVariable String id, @RequestBody @Valid Draw newDraw, HttpServletResponse response) {
 		return DRAW_REPOSITORY.findById(id).map(originalDraw -> {
 					if (!isThereEnoughTimeToEditDrawBeforeDrawExecution(originalDraw))
 						throw new EditingTimeLimitExceededException(id);
@@ -192,7 +196,8 @@ public class DrawController {
 	}
 
 	@PatchMapping("/draws/{id}/draw-instant")
-	public ResponseEntity<EntityModel<Draw>> editDrawDrawInstant(@PathVariable String id, @RequestBody @Valid DrawDrawInstantPatch drawDrawInstantPatch) {
+	@PreAuthorize("@DrawTokenManager.checkToken(new com.serpest.tidraw.security.DrawToken(#id, #token))")
+	public ResponseEntity<EntityModel<Draw>> editDrawDrawInstant(@RequestHeader("token") String token, @PathVariable String id, @RequestBody @Valid DrawDrawInstantPatch drawDrawInstantPatch) {
 		Draw draw = getDraw(id).getContent();
 		draw.setDrawInstant(drawDrawInstantPatch.drawInstant);
 		EntityModel<Draw> drawModel = DRAW_MODEL_ASSEMBLER.toModel(DRAW_REPOSITORY.save(draw));
