@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:share_plus/share_plus.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:tidraw/api.dart' as api;
 import 'package:tidraw/model/draw.dart';
 import 'package:tidraw/pages/edit_draw.dart';
+import 'package:tidraw/utils/constants.dart' as constants;
 import 'package:tidraw/utils/string_format_extension.dart';
 
 class DrawPage extends StatefulWidget {
@@ -20,11 +22,12 @@ class DrawPage extends StatefulWidget {
 class _DrawPageState extends State<DrawPage> {
   late Future<Draw> drawFuture;
   late Future<bool> editableFlagFuture;
+  String? token;
 
   @override
   void initState() {
     super.initState();
-    drawFuture = getDraw();
+    drawFuture = getDrawAndSetToken();
     editableFlagFuture = getEditableFlagFuture();
   }
 
@@ -169,7 +172,7 @@ class _DrawPageState extends State<DrawPage> {
       floatingActionButton: FutureBuilder<bool>(
         future: editableFlagFuture,
         builder: (context, snapshot) {
-          if (snapshot.hasData && snapshot.data!) { // TODO: && document.cookie != null && document.cookie!.contains(widget.id + '=')
+          if (snapshot.hasData && snapshot.data! && token != null) {
             return FloatingActionButton(
               child: Icon(Icons.edit),
               tooltip: 'Edit draw',
@@ -193,10 +196,12 @@ class _DrawPageState extends State<DrawPage> {
     );
   }
 
-  Future<Draw> getDraw() async {
+  Future<Draw> getDrawAndSetToken() async {
+    final storedTokens = await SharedPreferences.getInstance();
+    token = storedTokens.getString(constants.TOKEN_KEY_PREFIX + widget.id);
     Draw draw = await api.getDraw(widget.id);
     if (draw.selectedElements == null) {
-      Future.delayed(draw.drawInstant!.difference(DateTime.now()), () => drawFuture = getDraw());
+      Future.delayed(draw.drawInstant!.difference(DateTime.now()), () => drawFuture = getDrawAndSetToken());
     }
     return draw;
   }

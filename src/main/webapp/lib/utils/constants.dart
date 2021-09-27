@@ -3,3 +3,6 @@ const String API_URL = String.fromEnvironment('API_URL');
 
 // DRAW_ID_LENGTH environment variable must always be declared
 const int DRAW_ID_LENGTH = int.fromEnvironment('DRAW_ID_LENGTH');
+
+// Used to store locally the tokens
+final TOKEN_KEY_PREFIX = 'token-';

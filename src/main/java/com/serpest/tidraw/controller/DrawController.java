@@ -6,7 +6,6 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 import java.time.Duration;
 import java.time.Instant;
 
-import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 import javax.validation.constraints.Future;
@@ -39,7 +38,7 @@ import com.serpest.tidraw.repository.DrawRepository;
 import com.serpest.tidraw.security.DrawTokenManager;
 
 @RestController
-@CrossOrigin
+@CrossOrigin(exposedHeaders = "Token")
 @RequestMapping("/api")
 public class DrawController {
 
@@ -161,12 +160,7 @@ public class DrawController {
 		Draw savedDraw = DRAW_REPOSITORY.save(draw);
 
 		String token = DRAW_TOKEN_MANAGER.createToken(savedDraw.getId());
-		Cookie cookie = new Cookie("creator-token", token);
-		cookie.setPath("/api/draws/" + savedDraw.getId());
-		cookie.setMaxAge(Integer.MAX_VALUE); // An alternative to "Integer.MAX_VALUE" could be "(int) Duration.between(Instant.now(), getNoEditableInstant(savedDraw)).getSeconds()", but than the cookie should be edited if the draw is updated
-		cookie.setSecure(true);
-		cookie.setHttpOnly(true);
-		response.addCookie(cookie);
+		response.addHeader("Token", token);
 
 		EntityModel<Draw> drawModel = DRAW_MODEL_ASSEMBLER.toModel(savedDraw);
 		return ResponseEntity

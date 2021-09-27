@@ -40,7 +40,7 @@ class App extends StatelessWidget {
         }
         // EditDrawPage.route generation
         if (settings.name != null && editDrawPageRegex.hasMatch(settings.name!)) {
-          String id = settings.name!.substring(settings.name!.lastIndexOf('/', settings.name!.length - 6), settings.name!.length - 5);
+          String id = settings.name!.substring(settings.name!.lastIndexOf('/', settings.name!.length - 6) + 1, settings.name!.length - 5);
           return MaterialPageRoute(
             builder: (context) {
               return EditDrawPage(id: id);
