@@ -169,7 +169,7 @@ public class DrawController {
 	}
 
 	@PutMapping("/draws/{id}")
-	@PreAuthorize("@DrawTokenManager.checkToken(new com.serpest.tidraw.security.DrawToken(#id, #token))")
+	@PreAuthorize("@drawTokenManager.checkToken(new com.serpest.tidraw.security.DrawToken(#id, #token))")
 	public ResponseEntity<EntityModel<Draw>> replaceDraw(@RequestHeader(value="token", required=false) String token, @PathVariable String id, @RequestBody @Valid Draw newDraw, HttpServletResponse response) {
 		return DRAW_REPOSITORY.findById(id).map(originalDraw -> {
 					if (!isThereEnoughTimeToEditDrawBeforeDrawExecution(originalDraw))
@@ -190,7 +190,7 @@ public class DrawController {
 	}
 
 	@PatchMapping("/draws/{id}/draw-instant")
-	@PreAuthorize("@DrawTokenManager.checkToken(new com.serpest.tidraw.security.DrawToken(#id, #token))")
+	@PreAuthorize("@drawTokenManager.checkToken(new com.serpest.tidraw.security.DrawToken(#id, #token))")
 	public ResponseEntity<EntityModel<Draw>> editDrawDrawInstant(@RequestHeader(value="token", required=false) String token, @PathVariable String id, @RequestBody @Valid DrawDrawInstantPatch drawDrawInstantPatch) {
 		Draw draw = getDraw(id).getContent();
 		draw.setDrawInstant(drawDrawInstantPatch.drawInstant);

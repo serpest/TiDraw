@@ -48,7 +48,7 @@ Future<bool> deleteDraw(String id) async {
   final tokenKey = constants.TOKEN_KEY_PREFIX + id;
   Map<String, String> headers = {};
   if (storedTokens.containsKey(tokenKey)) {
-    headers[tokenKey] = storedTokens.getString(tokenKey)!;
+    headers['Token'] = storedTokens.getString(tokenKey)!;
   }
   try {
     final response = await http.delete(
@@ -107,7 +107,7 @@ Future<Draw> replaceDraw(Draw draw) async {
   final tokenKey = constants.TOKEN_KEY_PREFIX + draw.id!;
   Map<String, String> headers = {};
   if (storedTokens.containsKey(tokenKey)) {
-    headers[tokenKey] = storedTokens.getString(tokenKey)!;
+    headers['Token'] = storedTokens.getString(tokenKey)!;
   }
   headers['Content-Type'] = 'application/json; charset=UTF-8';
   try {
