@@ -184,7 +184,14 @@ class _DrawPageState extends State<DrawPage> {
                   assert (value == null || value is bool);
                   if (value != null && value as bool) {
                     // Reload DrawPage
-                    Navigator.popAndPushNamed(context, DrawPage.route.format([widget.id]));
+                    Navigator.pushReplacement(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) {
+                          return DrawPage(id: widget.id);
+                        }
+                      )
+                    );
                   }
                 });
               },
