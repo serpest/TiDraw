@@ -1,7 +1,9 @@
-# TiDraw
+﻿# TiDraw
 TiDraw is a draw system based on client-server model designed to be as secure as possible. For this reason, the draw is executed by the server and the users can't cheat altering the draw.
 
-Another feature that enhances the security is having an option that makes the draw results appear from a selected date and time. In this way, the draw creator can share the draw link with other people before the draw instant to assure them that he/she hadn't generated more then one draw waiting for the preferred results.
+A feature that enhances draw validity is enabling an option that makes the draw results appear from a selected date and time. In this way, the draw creator can share the draw link with other people before the draw instant to assure them that he/she hadn't generated more then one draw waiting for the preferred result.
+
+The draw creator is able to edit and to delete the draw enough time before its execution. The authorization system that permits that feature works under the hood using tokens, in this way the user doesn't have to remember a password or to create an account.
 
 <div>
     <img src="https://user-images.githubusercontent.com/49209517/135277039-05b0e67c-ab9d-4287-8ee3-509e8b207314.png" width="24%"/>
@@ -12,7 +14,7 @@ Another feature that enhances the security is having an option that makes the dr
 
 ## Deployment
 1. [Create an application on Heroku](https://devcenter.heroku.com/articles/creating-apps);
-2. [Set up the following buildpacks in the specified order on Heroku](https://devcenter.heroku.com/articles/using-multiple-buildpacks-for-an-app):
+2. [Set up the following buildpacks on Heroku](https://devcenter.heroku.com/articles/using-multiple-buildpacks-for-an-app) in the specified order:
     ``` properties
     1. ee\heroku-buildpack-flutter-light
     2. heroku\java
