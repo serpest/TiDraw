@@ -3,6 +3,7 @@ import 'package:intl/intl.dart';
 import 'package:tidraw/api.dart' as api;
 import 'package:tidraw/model/draw.dart';
 import 'package:tidraw/pages/draw.dart';
+import 'package:tidraw/utils/constants.dart' as constants;
 import 'package:tidraw/utils/string_format_extension.dart';
 
 class CreateDrawPage extends StatefulWidget {
@@ -22,9 +23,6 @@ class _CreateDrawPageState extends State<CreateDrawPage> {
   final drawTimeController = TextEditingController();
   final selectedElementsSizeController = TextEditingController();
   final addRaffleElementController = TextEditingController();
-
-  final dateRegex = RegExp(r'^\d{4}\-(0[1-9]|1[012])\-(0[1-9]|[12][0-9]|3[01])$');
-  final timeRegex = RegExp(r'^([01][0-9]|2[0-3]):([0-5][0-9])$');
 
   @override
   void dispose() {
@@ -75,7 +73,7 @@ class _CreateDrawPageState extends State<CreateDrawPage> {
                       // TODO
                       if (value == null || value.isEmpty) {
                         return null;
-                      } else if (!dateRegex.hasMatch(value)) {
+                      } else if (!constants.DATE_REGEX.hasMatch(value)) {
                         return 'The date must be formatted like 2021-08-30';
                       }
                       return null;
@@ -102,7 +100,7 @@ class _CreateDrawPageState extends State<CreateDrawPage> {
                       // TODO
                       if (value == null || value.isEmpty) {
                         return null;
-                      } else if (!timeRegex.hasMatch(value)) {
+                      } else if (!constants.TIME_REGEX.hasMatch(value)) {
                         return 'The time must be formatted like 02:46';
                       }
                       return null;

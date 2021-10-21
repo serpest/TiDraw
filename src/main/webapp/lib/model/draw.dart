@@ -1,7 +1,7 @@
 class Draw {
   final String? id;
   final String name;
-	final DateTime? creationInstant;
+  final DateTime? creationInstant;
   final DateTime? lastModifiedInstant;
   final DateTime? drawInstant;
   final int selectedElementsSize;

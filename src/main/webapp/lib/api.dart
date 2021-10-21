@@ -16,7 +16,7 @@ Future<Draw> getDraw(String id) async {
       throw ApiException('Draw not found');
     } else {
       // TODO
-      throw Exception('Failed to load draw');
+      throw ApiException('Failed to load draw');
     }
   } on TimeoutException {
     throw ApiException('Connection timed out');
@@ -34,7 +34,7 @@ Future<DateTime> getNoEditableInstant(String id) async {
       throw ApiException('Draw not found');
     } else {
       // TODO
-      throw Exception('Failed to check editability');
+      throw ApiException('Failed to check editability');
     }
   } on TimeoutException {
     throw ApiException('Connection timed out');
@@ -57,13 +57,15 @@ Future<bool> deleteDraw(String id) async {
     );
     if (response.statusCode == 204) {
       return true;
+    } else if (response.statusCode == 403) {
+      throw ApiException('Not authorised to delete draw');
     } else if (response.statusCode == 404) {
       throw ApiException('Draw not found');
     } else if (response.statusCode == 410) {
       throw ApiException('Draw no longer deletable');
     } else {
       // TODO
-      throw Exception('Failed to check editability');
+      throw ApiException('Failed to delete draw');
     }
   } on TimeoutException {
     throw ApiException('Connection timed out');
@@ -119,6 +121,8 @@ Future<Draw> replaceDraw(Draw draw) async {
     );
     if (response.statusCode == 201) {
       return Draw.fromJson(jsonDecode(response.body));
+    } else if (response.statusCode == 403) {
+      throw ApiException('Not authorised to edit draw');
     } else if (response.statusCode == 410) {
       throw ApiException('Draw no longer editable');
     } else {
