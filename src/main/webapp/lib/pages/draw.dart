@@ -39,6 +39,66 @@ class _DrawPageState extends State<DrawPage> {
         centerTitle: true,
         actions: [
           IconButton(
+            icon: Icon(Icons.info_outline),
+              onPressed: () async {
+                await showDialog(
+                  context: context,
+                  builder: (BuildContext context) {
+                    return AlertDialog(
+                      title: Text('Additional informations'),
+                      content: FutureBuilder<Draw>(
+                        future: drawFuture,
+                        builder: (context, snapshot) {
+                          if (snapshot.hasData) {
+                            String creationInstantStr = (snapshot.data!.creationInstant != null) ?
+                              DateFormat('yyyy-MM-dd HH:mm:ss').format(snapshot.data!.creationInstant!.toLocal()) : 'Unknown';
+                            String lastModifiedInstantStr = (snapshot.data!.lastModifiedInstant != null) ?
+                              DateFormat('yyyy-MM-dd HH:mm:ss').format(snapshot.data!.lastModifiedInstant!.toLocal()) : 'Unknown';
+                            return Column(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                TextFormField(
+                                  decoration: InputDecoration(
+                                    icon: Icon(Icons.access_time),
+                                    labelText: 'Creation instant',
+                                  ),
+                                  initialValue: creationInstantStr,
+                                  enabled: false,
+                                ),
+                                TextFormField(
+                                  decoration: InputDecoration(
+                                    icon: Icon(Icons.access_time),
+                                    labelText: 'Last modified instant',
+                                  ),
+                                  initialValue: lastModifiedInstantStr,
+                                  enabled: false,
+                                ),
+                              ],
+                            );
+                          } else if (snapshot.hasError) {
+                            if (snapshot.error is api.ApiException) {
+                              return Text(snapshot.error.toString());
+                            } else {
+                              // TODO
+                              return Text('Unknown error');
+                            }
+                          }
+                          return CircularProgressIndicator();
+                        },
+                      ),
+                      actions: [
+                        TextButton(
+                          onPressed: () => Navigator.pop(context),
+                          child: Text('Close')
+                        ),
+                      ],
+                    );
+                  },
+                );
+              },
+            tooltip: 'Additional informations',
+          ),
+          IconButton(
             icon: Icon(Icons.share),
             onPressed: () {
               Share.share(
@@ -55,8 +115,6 @@ class _DrawPageState extends State<DrawPage> {
           future: drawFuture,
           builder: (context, snapshot) {
             if (snapshot.hasData) {
-              String creationInstantStr = (snapshot.data!.creationInstant != null) ?
-                DateFormat('yyyy-MM-dd HH:mm:ss').format(snapshot.data!.creationInstant!.toLocal()) : 'Unknown';
               String lastModifiedInstantStr = (snapshot.data!.lastModifiedInstant != null) ?
                 DateFormat('yyyy-MM-dd HH:mm:ss').format(snapshot.data!.lastModifiedInstant!.toLocal()) : 'Unknown';
               String drawInstantStr = (snapshot.data!.drawInstant != null) ?
@@ -72,22 +130,6 @@ class _DrawPageState extends State<DrawPage> {
                         labelText: 'Name',
                       ),
                       initialValue: snapshot.data!.name,
-                      enabled: false,
-                    ),
-                    TextFormField(
-                      decoration: InputDecoration(
-                        icon: Icon(Icons.access_time),
-                        labelText: 'Creation instant',
-                      ),
-                      initialValue: creationInstantStr,
-                      enabled: false,
-                    ),
-                    TextFormField(
-                      decoration: InputDecoration(
-                        icon: Icon(Icons.access_time),
-                        labelText: 'Last modified instant',
-                      ),
-                      initialValue: lastModifiedInstantStr,
                       enabled: false,
                     ),
                     TextFormField(
