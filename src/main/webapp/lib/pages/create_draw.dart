@@ -72,11 +72,16 @@ class _CreateDrawPageState extends State<CreateDrawPage> {
                       labelText: 'Draw date',
                     ),
                     validator: (value) {
-                      // TODO
-                      if (value == null || value.isEmpty) {
-                        return null;
+                      if ((value == null || value.isEmpty)) {
+                        if (drawTimeController.text.isEmpty) {
+                          return null;
+                        } else {
+                          return 'To use a custom draw time you have to enter a date too';
+                        }
                       } else if (!constants.DATE_REGEX.hasMatch(value)) {
                         return 'The date must be formatted like 2021-08-30';
+                      } else if (DateTime.parse(value).difference(DateTime.now()).inDays < 0) {
+                        return 'The date must not be in the past';
                       }
                       return null;
                     },
@@ -99,11 +104,16 @@ class _CreateDrawPageState extends State<CreateDrawPage> {
                       labelText: 'Draw time',
                     ),
                     validator: (value) {
-                      // TODO
-                      if (value == null || value.isEmpty) {
-                        return null;
+                      if ((value == null || value.isEmpty)) {
+                        if (drawDateController.text.isEmpty) {
+                          return null;
+                        } else {
+                          return 'To use a custom draw date you have to enter a time too';
+                        }
                       } else if (!constants.TIME_REGEX.hasMatch(value)) {
                         return 'The time must be formatted like 02:46';
+                      } else if (DateTime.parse(drawDateController.text).difference(DateTime.now()).inDays == 0 && !DateTime.parse(drawDateController.text + ' ' + drawTimeController.text).isAfter(DateTime.now())) {
+                        return 'The time must be in the future';
                       }
                       return null;
                     },
