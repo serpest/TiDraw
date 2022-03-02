@@ -79,8 +79,7 @@ class _DrawPageState extends State<DrawPage> {
                             if (snapshot.error is api.ApiException) {
                               return Text(snapshot.error.toString());
                             } else {
-                              // TODO
-                              return Text('Unknown error');
+                              return Text('Unexpected error');
                             }
                           }
                           return CircularProgressIndicator();
@@ -187,6 +186,9 @@ class _DrawPageState extends State<DrawPage> {
                         Center(
                           child: Card(
                             child: ListTile(
+                              // Using this approach, the client doesn't have to send multiple requests to the server,
+                              // but, on the other hand, if the creator anticipates the draw instant, the spectators can't
+                              // see the result in the new draw instant without refreshing the page.
                               title: Text(getDurationStrAndScheduleNextViewRefresh(snapshot.data!.drawInstant!.difference(DateTime.now())) + ' to the draw execution'),
                               leading: Icon(
                                 Icons.warning_amber_outlined,
@@ -203,8 +205,7 @@ class _DrawPageState extends State<DrawPage> {
               if (snapshot.error is api.ApiException) {
                 return Text(snapshot.error.toString());
               } else {
-                // TODO
-                return Text('Unknown error');
+                return Text('Unexpected error');
               }
             }
             return CircularProgressIndicator();

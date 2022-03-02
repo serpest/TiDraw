@@ -6,8 +6,6 @@ import 'package:tidraw/pages/draw.dart';
 import 'package:tidraw/utils/constants.dart' as constants;
 import 'package:tidraw/utils/string_format_extension.dart';
 
-import '../api.dart';
-
 class CreateDrawPage extends StatefulWidget {
   static const route = '/create-draw';
 
@@ -235,7 +233,7 @@ class _CreateDrawPageState extends State<CreateDrawPage> {
                 context,
                 DrawPage.route.format([createdDraw.id]),
               );
-            } on ApiException catch(exc) {
+            } on api.ApiException catch(exc) {
               ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(exc.message)));
             } on Exception {
               ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Unexpected error')));

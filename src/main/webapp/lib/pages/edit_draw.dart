@@ -6,8 +6,6 @@ import 'package:tidraw/pages/draw.dart';
 import 'package:tidraw/pages/home.dart';
 import 'package:tidraw/utils/constants.dart' as constants;
 
-import '../api.dart';
-
 class EditDrawPage extends StatefulWidget {
   static const route = DrawPage.route + '/edit';
 
@@ -88,8 +86,8 @@ class _EditDrawPageState extends State<EditDrawPage> {
                                 Navigator.pop(context);
                                 Navigator.pop(context);
                                 // TODO: It could happen that the deletion request doesn't arrive to the server and the user
-                                // would think that that the draw has been deleted because it isn't diplayed anymore, so it
-                                // could be useful to implement an alert dialog that displays the eventual failure.
+                                // would think that the draw has been deleted because it isn't displayed anymore, so
+                                // it could be useful to implement an alert dialog that displays the eventual failure.
                                 if (await api.deleteDraw(widget.id)) {
                                   Navigator.pushNamedAndRemoveUntil(context, HomePage.route, (route) => false);
                                 }
@@ -295,7 +293,7 @@ class _EditDrawPageState extends State<EditDrawPage> {
                   try {
                     await api.replaceDraw(formDraw);
                     Navigator.pop(context, true);
-                  } on ApiException catch(exc) {
+                  } on api.ApiException catch(exc) {
                     ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(exc.message)));
                   } on Exception {
                     ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Unexpected error')));
