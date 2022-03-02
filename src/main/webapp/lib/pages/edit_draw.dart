@@ -69,9 +69,34 @@ class _EditDrawPageState extends State<EditDrawPage> {
                 IconButton(
                   icon: Icon(Icons.delete),
                   onPressed: () async {
-                    if (await api.deleteDraw(widget.id)) {
-                      Navigator.pushNamedAndRemoveUntil(context, HomePage.route, (route) => false);
-                    }
+                    FocusScope.of(context).unfocus(); // On mobile it prevents to show the keyboard again focusing on the last selected field
+                    await showDialog(
+                      context: context,
+                      builder: (BuildContext context) {
+                        return AlertDialog(
+                          title: Text('Deletion confirmation'),
+                          content: Text('Are you sure you want to delete this draw?'),
+                          actions: [
+                            TextButton(
+                              onPressed: () => Navigator.pop(context),
+                              child: Text('Cancel')
+                            ),
+                            ElevatedButton(
+                              onPressed: () async {
+                                Navigator.pop(context);
+                                Navigator.pop(context);
+                                // It could happen that the deletion request doesn't arrive to the server and the user
+                                // would think that that the draw has been deleted because it isn't diplayed anymore.
+                                if (await api.deleteDraw(widget.id)) {
+                                  Navigator.pushNamedAndRemoveUntil(context, HomePage.route, (route) => false);
+                                }
+                              },
+                              child: Text('Delete')
+                            ),
+                          ],
+                        );
+                      },
+                    );
                   },
                   tooltip: 'Delete draw',
                 ),
