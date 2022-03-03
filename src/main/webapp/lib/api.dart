@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:http/http.dart' as http;
+import 'package:http/http.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:tidraw/model/draw.dart';
 import 'package:tidraw/utils/constants.dart' as constants;
@@ -15,12 +16,14 @@ Future<Draw> getDraw(String id) async {
     } else if (response.statusCode == 404) {
       throw ApiException('Draw not found');
     } else {
-      // TODO
+      assert(false); // This code should be unreachable
       throw ApiException('Failed to load draw');
     }
   } on TimeoutException {
     throw ApiException('Connection timed out');
   } on SocketException {
+    throw ApiException('Connection failed');
+  } on ClientException {
     throw ApiException('Connection failed');
   }
 }
@@ -33,12 +36,14 @@ Future<DateTime> getNoEditableInstant(String id) async {
     } else if (response.statusCode == 404) {
       throw ApiException('Draw not found');
     } else {
-      // TODO
+      assert(false); // This code should be unreachable
       throw ApiException('Failed to check editability');
     }
   } on TimeoutException {
     throw ApiException('Connection timed out');
   } on SocketException {
+    throw ApiException('Connection failed');
+  } on ClientException {
     throw ApiException('Connection failed');
   }
 }
@@ -64,12 +69,14 @@ Future<bool> deleteDraw(String id) async {
     } else if (response.statusCode == 410) {
       throw ApiException('Draw no longer deletable');
     } else {
-      // TODO
+      assert(false); // This code should be unreachable
       throw ApiException('Failed to delete draw');
     }
   } on TimeoutException {
     throw ApiException('Connection timed out');
   } on SocketException {
+    throw ApiException('Connection failed');
+  } on ClientException {
     throw ApiException('Connection failed');
   }
 }
@@ -94,12 +101,14 @@ Future<Draw> createDraw(Draw draw) async {
       }
       return draw;
     } else {
-      // TODO
+      assert(false); // This code should be unreachable
       throw ApiException('Failed to create draw');
     }
   } on TimeoutException {
     throw ApiException('Connection timed out');
   } on SocketException {
+    throw ApiException('Connection failed');
+  } on ClientException {
     throw ApiException('Connection failed');
   }
 }
@@ -126,12 +135,14 @@ Future<Draw> replaceDraw(Draw draw) async {
     } else if (response.statusCode == 410) {
       throw ApiException('Draw no longer editable');
     } else {
-      // TODO
+      assert(false); // This code should be unreachable
       throw ApiException('Failed to update draw');
     }
   } on TimeoutException {
     throw ApiException('Connection timed out');
   } on SocketException {
+    throw ApiException('Connection failed');
+  } on ClientException {
     throw ApiException('Connection failed');
   }
 }
