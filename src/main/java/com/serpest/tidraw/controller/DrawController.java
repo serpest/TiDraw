@@ -16,7 +16,6 @@ import org.springframework.hateoas.IanaLinkRelations;
 import org.springframework.hateoas.LinkRelation;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.access.prepost.PreFilter;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -144,8 +143,8 @@ public class DrawController {
 		return selectedElementsModel;
 	}
 
+	// TODO: Return status code 404 before authorization
 	@DeleteMapping("/draws/{id}")
-	@PreFilter(filterTarget = "id", value = "DRAW_REPOSITORY.existsById(id)") // To return status code 404 before authorization
 	@PreAuthorize("@drawTokenManager.checkToken(new com.serpest.tidraw.security.DrawToken(#id, #token))")
 	public ResponseEntity<Object> deleteDraw(@RequestHeader(value="token", required=false) String token, @PathVariable String id) {
 		Draw draw = DRAW_REPOSITORY.findById(id).orElseThrow(() -> new DrawNotFoundException(id));

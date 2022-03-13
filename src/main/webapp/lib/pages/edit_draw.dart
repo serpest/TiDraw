@@ -72,7 +72,7 @@ class _EditDrawPageState extends State<EditDrawPage> {
                     FocusScope.of(context).unfocus(); // On mobile it prevents to show the keyboard again focusing on the last selected field
                     await showDialog(
                       context: context,
-                      builder: (BuildContext context) {
+                      builder: (BuildContext dialogContext) {
                         return AlertDialog(
                           title: Text('Deletion confirmation'),
                           content: Text('Are you sure you want to delete this draw?'),
@@ -83,13 +83,15 @@ class _EditDrawPageState extends State<EditDrawPage> {
                             ),
                             ElevatedButton(
                               onPressed: () async {
-                                Navigator.pop(context);
-                                Navigator.pop(context);
-                                // TODO: It could happen that the deletion request doesn't arrive to the server and the user
-                                // would think that the draw has been deleted because it isn't displayed anymore, so
-                                // it could be useful to implement an alert dialog that displays the eventual failure.
-                                if (await api.deleteDraw(widget.id)) {
-                                  Navigator.pushNamedAndRemoveUntil(context, HomePage.route, (route) => false);
+                                Navigator.pop(dialogContext);
+                                try {
+                                  await api.deleteDraw(widget.id);
+                                  Navigator.pop(context);
+                                  Navigator.pop(context);
+                                } on api.ApiException catch(exc) {
+                                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(exc.message)));
+                                } on Exception {
+                                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Unexpected error')));
                                 }
                               },
                               child: Text('Delete')
