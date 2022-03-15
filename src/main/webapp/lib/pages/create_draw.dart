@@ -150,6 +150,7 @@ class _CreateDrawPageState extends State<CreateDrawPage> {
           ),
           Divider(
             height: 32.0,
+            color: Colors.grey,
           ),
           Text('Raffle elements'),
           Expanded(

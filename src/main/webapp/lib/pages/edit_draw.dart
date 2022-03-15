@@ -214,6 +214,7 @@ class _EditDrawPageState extends State<EditDrawPage> {
                 ),
                 Divider(
                   height: 32.0,
+                  color: Colors.grey,
                 ),
                 Text('Raffle elements'),
                 Expanded(

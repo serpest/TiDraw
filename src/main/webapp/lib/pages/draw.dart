@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:share_plus/share_plus.dart';
+import 'package:share/share.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:tidraw/api.dart' as api;
 import 'package:tidraw/model/draw.dart';
@@ -149,6 +149,7 @@ class _DrawPageState extends State<DrawPage> {
                     ),
                     Divider(
                       height: 32.0,
+                      color: Colors.grey,
                     ),
                     Text('Raffle elements'),
                     Expanded(
@@ -167,6 +168,7 @@ class _DrawPageState extends State<DrawPage> {
                     ),
                     Divider(
                       height: 32.0,
+                      color: Colors.grey,
                     ),
                     Text('Selected elements'),
                     Expanded(
