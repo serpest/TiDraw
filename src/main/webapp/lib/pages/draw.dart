@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:share/share.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:tidraw/api.dart' as api;
 import 'package:tidraw/model/draw.dart';
@@ -96,16 +95,6 @@ class _DrawPageState extends State<DrawPage> {
                 );
               },
             tooltip: 'Additional informations',
-          ),
-          IconButton(
-            icon: Icon(Icons.share),
-            onPressed: () {
-              Share.share(
-                'Check out my draw at ' + Uri.base.toString(),
-                subject: 'Draw link',
-              );
-            },
-            tooltip: 'Share draw',
           ),
         ],
       ),
