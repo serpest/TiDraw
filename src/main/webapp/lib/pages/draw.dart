@@ -281,6 +281,7 @@ class _DrawPageState extends State<DrawPage> {
       Future.delayed(Duration(seconds: 1), () => setState(() {}));
       return duration.inSeconds.toString() + ' seconds';
     }
+    Future.delayed(Duration(milliseconds: 500), () => setState(() {}));
     return 'Less then a second';
   }
 }
