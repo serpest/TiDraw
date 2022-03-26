@@ -3,7 +3,6 @@ import 'package:intl/intl.dart';
 import 'package:tidraw/api.dart' as api;
 import 'package:tidraw/model/draw.dart';
 import 'package:tidraw/pages/draw.dart';
-import 'package:tidraw/pages/home.dart';
 import 'package:tidraw/utils/constants.dart' as constants;
 
 class EditDrawPage extends StatefulWidget {
