@@ -220,6 +220,13 @@ class _CreateDrawPageState extends State<CreateDrawPage> {
       bottomNavigationBar: ElevatedButton.icon(
         icon: Icon(Icons.save),
         label: Text('Create'),
+        style: ButtonStyle(
+          shape: MaterialStateProperty.all(
+            RoundedRectangleBorder(
+              borderRadius: BorderRadius.zero,
+            )
+          ),
+        ),
         onPressed: () async {
           if (_formKey.currentState != null && _formKey.currentState!.validate()) {
             Draw formDraw = Draw(

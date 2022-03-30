@@ -283,6 +283,13 @@ class _EditDrawPageState extends State<EditDrawPage> {
             bottomNavigationBar: ElevatedButton.icon(
               icon: Icon(Icons.save),
               label: Text('Edit'),
+              style: ButtonStyle(
+                shape: MaterialStateProperty.all(
+                  RoundedRectangleBorder(
+                    borderRadius: BorderRadius.zero,
+                  )
+                ),
+              ),
               onPressed: () async {
                 if (_formKey.currentState != null && _formKey.currentState!.validate()) {
                   Draw formDraw = Draw(

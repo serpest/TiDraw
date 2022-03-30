@@ -52,6 +52,13 @@ class _SearchDrawPageState extends State<SearchDrawPage> {
       bottomNavigationBar: ElevatedButton.icon(
         icon: Icon(Icons.search),
         label: Text('Search'),
+        style: ButtonStyle(
+          shape: MaterialStateProperty.all(
+            RoundedRectangleBorder(
+              borderRadius: BorderRadius.zero,
+            )
+          ),
+        ),
         onPressed: () {
           if (_formKey.currentState != null && _formKey.currentState!.validate()) {
             Navigator.pushNamed(
